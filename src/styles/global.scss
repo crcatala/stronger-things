@@ -1,0 +1,76 @@
+@import "./variables.scss";
+
+html,
+body {
+  font-family: $system-font-family;
+  background-color: $color-grey-light;
+  color: $color-grey-dark;
+}
+
+//
+// Jumping Scrollbar Issue
+// When moving from one page of a site without a scrollbar to another with a scrollbar
+// https://css-tricks.com/elegant-fix-jumping-scrollbar-issue/
+//
+html {
+  overflow-y: scroll;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: $heading-text-color;
+}
+
+.ui-color-light {
+  color: $color-grey;
+}
+
+//
+// search input
+//
+input.search {
+}
+
+//
+// Shared Transitions
+//
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s $swift-ease-out-timing-function;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+//
+// Link styles
+//
+a {
+  color: $color-blue;
+  transition: color 0.2s;
+
+  &:hover {
+    color: lighten($color-blue, 10%);
+  }
+}
+
+// Modal Overrides
+.app-modal-container {
+  .v--modal-overlay {
+    background: rgba(72, 105, 151, 0.25);
+  }
+  .v--modal {
+    box-shadow: -1px 0 12px 0 rgba(0, 0, 0, 0.08);
+  }
+  .overlay-fade-enter-active,
+  .overlay-fade-leave-active {
+    // transition: all 0.2s;
+    transition: all 0.25s ease-in-out;
+  }
+}

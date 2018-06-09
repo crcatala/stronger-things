@@ -1,7 +1,14 @@
 import Vue from "vue";
+import Notifications from "vue-notification";
+import VModal from "vue-js-modal";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+import "normalize.css";
+import "@/styles/global.scss";
+
+Vue.use(Notifications);
+Vue.use(VModal, { dynamic: true });
 
 Vue.config.productionTip = false;
 

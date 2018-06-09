@@ -1,29 +1,55 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+  <div :class="$style.app">
+    <AppHeader v-if='currentUser' />
+    <transition name="route" mode="out-in">
+      <router-view :key='$route.path' />
+    </transition>
+    <notifications group="main" position="bottom right" style='bottom: 16px; right: 16px;' />
+    <modals-container class='app-modal-container' />
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import AppHeader from "@/components/AppHeader.vue";
+
+@Component({
+  components: {
+    AppHeader
+  },
+  computed: {
+    currentUser() {
+      console.log(this.$store.getters);
+      console.log(this.$store.getters["sessions/currentUser"]);
+      return this.$store.getters["sessions/currentUser"];
     }
   }
+})
+export default class App extends Vue {
+  test = "hey";
+}
+</script>
+
+<style lang="scss" module>
+@import "@/styles/variables.scss";
+
+.app {
+  min-width: $app-min-width;
+}
+</style>
+
+<style lang='scss'>
+@import "@/styles/variables.scss";
+//
+// Global for transition
+//
+.route-enter-active,
+.route-leave-active {
+  transition: opacity 0.15s $swift-ease-out-timing-function;
+}
+
+.route-enter,
+.route-leave-to {
+  opacity: 0;
 }
 </style>
