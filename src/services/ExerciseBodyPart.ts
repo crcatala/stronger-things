@@ -12,6 +12,10 @@ const EXERCISE_BODY_PARTS: any = {
   512: "Cardio"
 };
 
+export const EXERCISE_BODY_PART_OPTIONS = Object.entries(
+  EXERCISE_BODY_PARTS
+).map((x: any) => ({ id: x[0], name: x[1] }));
+
 export function getExerciseBodyPartName(num: number): string {
   return EXERCISE_BODY_PARTS[num] || UNKNOWN_TYPE;
 }

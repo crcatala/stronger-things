@@ -10,6 +10,10 @@ const EXERCISE_TYPES: any = {
   7: "Duration"
 };
 
+export const EXERCISE_TYPE_OPTIONS = Object.entries(EXERCISE_TYPES).map(
+  (x: any) => ({ id: x[0], name: x[1] })
+);
+
 export function getExerciseTypeName(num: number) {
   return EXERCISE_TYPES[num] || UNKNOWN_TYPE;
 }

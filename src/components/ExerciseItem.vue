@@ -12,7 +12,6 @@
         </div>
         <div :class='$style.description'>
           {{ bodyPartName }} ({{ exerciseTypeName }})
-          <!-- {{ bodyPartName }} ({{ item.exerciseType }}) -->
         </div>
       </div>
     </div>

@@ -10,10 +10,10 @@
     <div :class='$style.filters'>
       <div>
         <div :class='$style.filterItem'>
-          <SingleSelect :loading='bodyPartsLoading' :options='bodyParts' label='name' noSelectionText="Any Body Part" @select='bodyPartSelected' />
+          <SingleSelect :loading='bodyPartsLoading' :options='bodyPartOptions' trackBy='id' label='name' noSelectionText="Any Body Part" @select='bodyPartSelected' />
         </div>
         <div :class='$style.filterItem'>
-          <SingleSelect :loading='categoriesLoading' :options='categories' label='name' noSelectionText="Any Category" @select='categorySelected' />
+          <SingleSelect :loading='categoriesLoading' :options='exerciseTypeOptions' trackBy='id' label='name' noSelectionText="Any Category" @select='categorySelected' />
         </div>
       </div>
     </div>
@@ -38,6 +38,8 @@ import InputField from "@/components/InputField.vue";
 import Spinner from "@/components/Spinner.vue";
 import EmptyResults from "@/components/EmptyResults.vue";
 import ExerciseNew from "@/components/ExerciseNew.vue";
+import { EXERCISE_BODY_PART_OPTIONS } from "@/services/ExerciseBodyPart";
+import { EXERCISE_TYPE_OPTIONS } from "@/services/ExerciseType";
 import Http from "@/services/Http";
 import Parse from "@/services/Parse";
 
@@ -60,12 +62,20 @@ export default class ExercisesView extends Vue {
   categoriesLoading: boolean = false;
   loading: boolean = false;
   items: Array<object> = [];
-  categories: Array<object> = [];
-  bodyParts: Array<object> = [];
+  // categories: Array<object> = [];
+  // bodyParts: Array<object> = [];
   categoryFilter: any = null;
   bodyPartFilter: any = null;
   searchFilter: string = "";
   category = null;
+
+  get bodyPartOptions() {
+    return EXERCISE_BODY_PART_OPTIONS;
+  }
+
+  get exerciseTypeOptions() {
+    return EXERCISE_TYPE_OPTIONS;
+  }
 
   search() {
     this.fetchExercises({
@@ -143,13 +153,13 @@ export default class ExercisesView extends Vue {
   }
 
   bodyPartSelected(item: any) {
-    this.bodyPartFilter = item;
-    this.search();
+    // this.bodyPartFilter = item;
+    // this.search();
   }
 
   categorySelected(item: any) {
-    this.categoryFilter = item;
-    this.search();
+    // this.categoryFilter = item;
+    // this.search();
   }
 
   closeModal() {
