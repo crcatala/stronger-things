@@ -14,7 +14,7 @@ const EXERCISE_BODY_PARTS: any = {
 
 export const EXERCISE_BODY_PART_OPTIONS = Object.entries(
   EXERCISE_BODY_PARTS
-).map((x: any) => ({ id: x[0], name: x[1] }));
+).map((x: any) => ({ id: parseInt(x[0]), name: x[1] }));
 
 export function getExerciseBodyPartName(num: number): string {
   return EXERCISE_BODY_PARTS[num] || UNKNOWN_TYPE;

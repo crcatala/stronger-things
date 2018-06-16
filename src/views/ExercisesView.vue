@@ -13,14 +13,14 @@
           <SingleSelect :loading='bodyPartsLoading' :options='bodyPartOptions' trackBy='id' label='name' noSelectionText="Any Body Part" @select='bodyPartSelected' />
         </div>
         <div :class='$style.filterItem'>
-          <SingleSelect :loading='categoriesLoading' :options='exerciseTypeOptions' trackBy='id' label='name' noSelectionText="Any Category" @select='categorySelected' />
+          <SingleSelect :loading='categoriesLoading' :options='exerciseTypeOptions' trackBy='id' label='name' noSelectionText="Any Category" @select='exerciseTypeSelected' />
         </div>
       </div>
     </div>
     <div v-if='loading' :class='$style.loading'>
       <Spinner/>
     </div>
-    <ExerciseList :items='items' v-else-if='items.length' />
+    <ExerciseList :items='filteredItems' v-else-if='filteredItems.length' />
     <div v-else :class='$style.loading'>
       <EmptyResults/>
     </div>
@@ -58,16 +58,11 @@ import Parse from "@/services/Parse";
 export default class ExercisesView extends Vue {
   @Prop() private msg!: string;
 
-  bodyPartsLoading: boolean = false;
-  categoriesLoading: boolean = false;
   loading: boolean = false;
   items: Array<object> = [];
-  // categories: Array<object> = [];
-  // bodyParts: Array<object> = [];
-  categoryFilter: any = null;
+  exerciseTypeFilter: any = null;
   bodyPartFilter: any = null;
   searchFilter: string = "";
-  category = null;
 
   get bodyPartOptions() {
     return EXERCISE_BODY_PART_OPTIONS;
@@ -77,43 +72,42 @@ export default class ExercisesView extends Vue {
     return EXERCISE_TYPE_OPTIONS;
   }
 
+  get filteredItems() {
+    // TODO: Use more elegant reduce method or bring in library
+    return this.items.filter((item: any) => {
+      const matchesBodyPart =
+        this.bodyPartFilter && this.bodyPartFilter.id === item.bodyParts;
+      const matchesExerciseType =
+        this.exerciseTypeFilter &&
+        this.exerciseTypeFilter.id === item.exerciseType;
+
+      if (this.bodyPartFilter && this.exerciseTypeFilter) {
+        return matchesBodyPart && matchesExerciseType;
+      }
+
+      if (this.bodyPartFilter) {
+        return matchesBodyPart;
+      }
+
+      if (this.exerciseTypeFilter) {
+        return matchesExerciseType;
+      }
+
+      return true;
+    });
+  }
+
   search() {
     this.fetchExercises({
       searchFilter: this.searchFilter,
-      categoryFilter: this.categoryFilter,
+      exerciseTypeFilter: this.exerciseTypeFilter,
       bodyPartFilter: this.bodyPartFilter
     });
   }
 
-  async fetchCatgeories() {
-    const query = new Parse.Query("ExerciseCategory");
-    try {
-      this.categoriesLoading = true;
-      const results = await query.find();
-      this.categories = results.map((x: any) => x.toJSON());
-    } catch (e) {
-      console.log("TODO show error notification");
-    } finally {
-      this.categoriesLoading = false;
-    }
-  }
-
-  async fetchBodyParts() {
-    const query = new Parse.Query("ExerciseBodyPart");
-    try {
-      this.bodyPartsLoading = true;
-      const results = await query.find();
-      this.bodyParts = results.map((x: any) => x.toJSON());
-    } catch (e) {
-      console.log("TODO show error notification");
-    } finally {
-      this.bodyPartsLoading = false;
-    }
-  }
-
   async fetchExercises({
     searchFilter = "",
-    categoryFilter = null,
+    exerciseTypeFilter = null,
     bodyPartFilter = null
   } = {}) {
     const query = new Parse.Query("Exercise");
@@ -124,11 +118,11 @@ export default class ExercisesView extends Vue {
     if (searchFilter) {
       query.matches("name", searchFilter, "i");
     }
-    if (categoryFilter) {
+    if (exerciseTypeFilter) {
       query.equalTo(
         "category",
         new Parse.Object("ExerciseCategory", {
-          id: get(categoryFilter, "objectId")
+          id: get(exerciseTypeFilter, "objectId")
         })
       );
     }
@@ -153,12 +147,12 @@ export default class ExercisesView extends Vue {
   }
 
   bodyPartSelected(item: any) {
-    // this.bodyPartFilter = item;
+    this.bodyPartFilter = item;
     // this.search();
   }
 
-  categorySelected(item: any) {
-    // this.categoryFilter = item;
+  exerciseTypeSelected(item: any) {
+    this.exerciseTypeFilter = item;
     // this.search();
   }
 
