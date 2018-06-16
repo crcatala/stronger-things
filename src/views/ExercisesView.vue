@@ -3,17 +3,17 @@
     <div :class='$style.header'>
       <h1>Exercises</h1>
       <div>
-        <InputField placeholder='Search...' v-model='searchFilter' :class='$style.input' @submit='search' autoSubmit clearable/>
+        <InputField placeholder='Search...' v-model='searchInput' :class='$style.input' @submit='search' autoSubmit clearable/>
       </div>
       <AppButton @click.native='newClicked'>New</AppButton>
     </div>
     <div :class='$style.filters'>
       <div>
         <div :class='$style.filterItem'>
-          <SingleSelect :loading='bodyPartsLoading' :options='bodyPartOptions' trackBy='id' label='name' noSelectionText="Any Body Part" @select='bodyPartSelected' />
+          <SingleSelect :options='bodyPartOptions' trackBy='id' label='name' noSelectionText="Any Body Part" @select='bodyPartSelected' />
         </div>
         <div :class='$style.filterItem'>
-          <SingleSelect :loading='categoriesLoading' :options='exerciseTypeOptions' trackBy='id' label='name' noSelectionText="Any Category" @select='exerciseTypeSelected' />
+          <SingleSelect :options='exerciseTypeOptions' trackBy='id' label='name' noSelectionText="Any Category" @select='exerciseTypeSelected' />
         </div>
       </div>
     </div>
@@ -62,7 +62,8 @@ export default class ExercisesView extends Vue {
   items: Array<object> = [];
   exerciseTypeFilter: any = null;
   bodyPartFilter: any = null;
-  searchFilter: string = "";
+  searchInput: string = "";
+  searchFilter: string = ""; // Actual filter, lags behind input
 
   get bodyPartOptions() {
     return EXERCISE_BODY_PART_OPTIONS;
@@ -74,7 +75,7 @@ export default class ExercisesView extends Vue {
 
   get filteredItems() {
     // TODO: Use more elegant reduce method or bring in library
-    return this.items.filter((item: any) => {
+    const itemsMatchingFilters = this.items.filter((item: any) => {
       const matchesBodyPart =
         this.bodyPartFilter && this.bodyPartFilter.id === item.bodyParts;
       const matchesExerciseType =
@@ -95,65 +96,28 @@ export default class ExercisesView extends Vue {
 
       return true;
     });
+
+    if (this.searchFilter) {
+      return itemsMatchingFilters.filter((item: any) => {
+        return item.name
+          .toLowerCase()
+          .includes(this.searchFilter.toLowerCase());
+      });
+    }
+
+    return itemsMatchingFilters;
   }
 
   search() {
-    this.fetchExercises({
-      searchFilter: this.searchFilter,
-      exerciseTypeFilter: this.exerciseTypeFilter,
-      bodyPartFilter: this.bodyPartFilter
-    });
-  }
-
-  async fetchExercises({
-    searchFilter = "",
-    exerciseTypeFilter = null,
-    bodyPartFilter = null
-  } = {}) {
-    const query = new Parse.Query("Exercise");
-    // query.include('category').include('bodyPart');
-    query.include("category");
-    // query.equalTo("type", "official");
-    query.ascending("name");
-    if (searchFilter) {
-      query.matches("name", searchFilter, "i");
-    }
-    if (exerciseTypeFilter) {
-      query.equalTo(
-        "category",
-        new Parse.Object("ExerciseCategory", {
-          id: get(exerciseTypeFilter, "objectId")
-        })
-      );
-    }
-    if (bodyPartFilter) {
-      query.equalTo(
-        "bodyPart",
-        new Parse.Object("ExerciseBodyPart", {
-          id: get(bodyPartFilter, "objectId")
-        })
-      );
-    }
-    query.limit(100);
-    try {
-      this.loading = true;
-      const results = await query.find();
-      this.items = results.map((x: any) => x.toJSON());
-    } catch (e) {
-      console.log("TODO show error notification");
-    } finally {
-      this.loading = false;
-    }
+    this.searchFilter = this.searchInput;
   }
 
   bodyPartSelected(item: any) {
     this.bodyPartFilter = item;
-    // this.search();
   }
 
   exerciseTypeSelected(item: any) {
     this.exerciseTypeFilter = item;
-    // this.search();
   }
 
   closeModal() {
