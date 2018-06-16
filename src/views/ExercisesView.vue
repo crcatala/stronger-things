@@ -121,7 +121,7 @@ export default class ExercisesView extends Vue {
   }
 
   closeModal() {
-    console.log("closeModal");
+    // console.log("closeModal");
     this.$modal.hide("ExerciseNew");
   }
 
@@ -135,7 +135,6 @@ export default class ExercisesView extends Vue {
       console.log("success callback");
       console.log(this);
       this.closeModal();
-      this.fetchExercises();
     };
     this.$modal.show(
       ExerciseNew,
@@ -159,7 +158,7 @@ export default class ExercisesView extends Vue {
     try {
       this.loading = true;
       const results = await query.find();
-      console.log("exercises", results);
+      // console.log("exercises", results);
       this.items = results.map((x: any) => x.toJSON());
     } catch (e) {
       console.log("TODO show error notification");

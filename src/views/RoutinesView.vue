@@ -27,12 +27,21 @@ export default class RoutinesView extends Vue {
   items: Array<any> = [];
   loading = false;
 
+  get currentUser() {
+    return this.$store.getters["sessions/currentUser"];
+  }
+
   async fetchRoutines() {
     try {
       this.loading = true;
-      const query = new Parse.Query("WorkoutRoutine");
+      const query = new Parse.Query("ParseRoutine");
+      query.limit(100);
+      const user = new Parse.Object("_User", { id: this.currentUser.objectId });
+      query.equalTo("user", user);
+
       const results = await query.find();
       this.items = results.map((x: any) => x.toJSON());
+      console.log("routines", this.items);
     } catch (e) {
       console.log(e);
     } finally {
@@ -41,7 +50,7 @@ export default class RoutinesView extends Vue {
   }
 
   created() {
-    // this.fetchRoutines();
+    this.fetchRoutines();
   }
 }
 </script>

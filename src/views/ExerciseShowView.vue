@@ -7,7 +7,7 @@
       <h1 :class='$style.name'>
         {{ item.name }}
         <span :class='$style.meta'>
-          {{ item.bodyPart.name }} ({{ item.category.name }})
+          {{ bodyPartName }} ({{ categoryName }})
         </span>
       </h1>
       <template v-if='sessions.length'>
@@ -68,22 +68,14 @@ import ExerciseSessionItem from "@/components/ExerciseSessionItem.vue";
 import ExerciseHistoryChart from "@/components/ExerciseHistoryChart.vue";
 import EmptyResults from "@/components/EmptyResults.vue";
 import Spinner from "@/components/Spinner.vue";
+import { getExerciseTypeName } from "@/services/ExerciseType";
+import { getExerciseBodyPartName } from "@/services/ExerciseBodyPart";
 import Parse from "@/services/Parse";
-import { calculate1RM } from "@/services/LiftingCalculator.js";
+import { calculateAverage1RM } from "@/services/LiftingCalculator";
+import { weightInPounds } from "@/services/UnitConversion";
 import TrophyIcon from "@/assets/icons/trophy.svg";
 import MedalIcon from "@/assets/icons/medal.svg";
 import DumbbellIcon from "@/assets/icons/dumbbell.svg";
-
-function calculateAverage1RM(sets: Array<any>) {
-  const setsWith1RM = sets.map(set => {
-    return calculate1RM({ weight: set.weight, rpe: set.rpe, reps: set.reps });
-  });
-  const average = Math.round(
-    setsWith1RM.reduce((p, c) => p + c, 0) / setsWith1RM.length
-  );
-
-  return average;
-}
 
 @Component({
   components: {
@@ -103,10 +95,11 @@ export default class ExerciseShowView extends Vue {
   item = null;
   loading: boolean = true;
   error: string = "";
-  sessions = [];
+  // sessions = [];
 
   get xAxisData() {
-    return this.sessions.map((x: any) => x.startedAt.iso);
+    // return this.sessions.map((x: any) => x.startedAt.iso);
+    return this.sessions.map((x: any) => x.createdAt);
     // return this.sessions.map((x: any) => new Date(x.startedAt.iso));
   }
 
@@ -115,16 +108,17 @@ export default class ExerciseShowView extends Vue {
   get chartData() {
     return this.sessions.map((session: any) => {
       return {
-        x: session.startedAt.iso,
-        y: calculateAverage1RM(session.exerciseSets)
+        // x: session.startedAt.iso,
+        x: session.createdAt,
+        y: calculateAverage1RM(session.parseSetsDictionary)
       };
     });
   }
 
   get volumeData() {
     return this.sessions.map((session: any) => {
-      return session.exerciseSets.reduce(
-        (acc: any, val: any) => acc + val.weight * val.reps,
+      return session.parseSetsDictionary.reduce(
+        (acc: any, val: any) => acc + weightInPounds(val.kilograms) * val.reps,
         0
       );
     });
@@ -136,9 +130,9 @@ export default class ExerciseShowView extends Vue {
 
   get recordWeightAndReps() {
     const weightAndReps = this.sessions.map((session: any) => {
-      return session.exerciseSets.map((set: any) => {
+      return session.parseSetsDictionary.map((set: any) => {
         return {
-          weight: set.weight,
+          weight: weightInPounds(set.kilograms),
           reps: set.reps
         };
       });
@@ -159,6 +153,7 @@ export default class ExerciseShowView extends Vue {
 
   get record1RM() {
     if (this.sessions.length) {
+      console.log("record1RM this.chartData", this.chartData);
       const obj = maxBy(this.chartData, "y");
       return obj ? obj.y : null;
     } else {
@@ -166,25 +161,122 @@ export default class ExerciseShowView extends Vue {
     }
   }
 
-  async created() {
-    // try {
-    //   this.loading = true;
-    //   const query = new Parse.Query("Exercise");
-    //   query.include("bodyPart").include("category");
-    //   const item = await query.get(this.id);
-    //   const querySessions = new Parse.Query("ExerciseSession");
-    //   const exercise = new Parse.Object("Exercise", { id: item.id });
-    //   querySessions.descending("startedAt");
-    //   querySessions.equalTo("exercise", exercise);
-    //   const sessions = await querySessions.find();
-    //   console.log(sessions);
-    //   this.sessions = sessions.map((x: any) => x.toJSON());
-    //   this.item = item.toJSON();
-    // } catch (e) {
-    //   console.log("error", e);
-    // } finally {
-    //   this.loading = false;
-    // }
+  get currentUser() {
+    return this.$store.getters["sessions/currentUser"];
+  }
+
+  async fetchExerciseHistory() {
+    try {
+      this.loading = true;
+      const query = new Parse.Query("ParseSetGroup");
+      // query.include("user");
+      // const user = new Parse.Object("_User", { id: this.currentUser.objectId });
+      // const exercise = new Parse.Object("ParseExercise", { id: this.id });
+      // query.equalTo("isHidden", 0);
+      // query.equalTo("user", Parse.User.current());
+      // query.equalTo("parseExercise", exercise);
+      // query.descending("completionDate");
+
+      // filtering by user is slow 15seconds
+      // --> ahah if include user gets to 2 seconds (still kind of slow tho)
+      //  --> oh wait nm it doesnt matter. sometimes 15 seconds, sometimes not hmmm
+      // filtering by exercise is quick though hmmm
+      // filtering by isHidden is quick
+      // ordering by completionDate fails! times out
+      // Always varies, sometimes super slow even if filtering just by exercise
+      // I have theories....
+      // i think backend is caching queries or something
+      // and since so many users worlwide, updating a table could bust cache, and subsequent queries need to be rerun
+      //
+      query.limit(1);
+
+      const results = await query.find();
+      const items = results.map((x: any) => x.toJSON());
+      console.log("exercise history", items);
+      // this.sessions = sessions.map((x: any) => x.toJSON());
+      // this.item = item.toJSON();
+    } catch (e) {
+      console.log("error", e);
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  // async checkIfUpdateRequired() {
+  //   if (!Parse.User.current()) {
+  //     return;
+  //   }
+  //   // OOOOOFFF this is slow and never got results even plucking no extra
+  //   // attributes and limiting to 1!
+  //   // ---> guessing because the sheer volume of records for ParseSetGroup is so large (at least 10x that of a Workout)
+  //   const query = new Parse.Query("ParseSetGroup");
+  //   query.select([""]);
+  //   query.limit(1);
+  //   // 1 records -> 150ms 1k
+  //   // 10 records -> 150ms 2.2k
+  //   // 100 records -> 300ms 17k
+  //   // 500 records -> 350ms 67k
+  //   // const user = new Parse.Object("_User", { id: this.currentUser.objectId });
+  //   // query.equalTo("user", user);
+  //   // query.equalTo("isHidden", 0);
+  //   // Should we do by createdAt or updatedAt instead which are native?
+  //   // because we already have all data and can sort client-side by completionDate
+  //   // query.descending("completionDate");
+  //   // query.descending("updatedAt");
+
+  //   const results = await query.find();
+
+  //   const items = results.map((x: any) => x.toJSON());
+  //   // this.items = items;
+
+  //   console.log("checkIfUpdateRequired", items);
+  // }
+
+  get bodyPartName() {
+    return getExerciseBodyPartName(this.item.bodyParts);
+  }
+
+  get categoryName() {
+    return getExerciseTypeName(this.item.exerciseType);
+  }
+  get workouts() {
+    return this.$store.getters["workouts/list"];
+  }
+
+  get exerciseGroupsFromWorkoutHistory() {
+    const parseSetGroups = this.workouts.map((workout: any) => {
+      return workout.parseSetGroups;
+    });
+
+    const parseSetGroupsFlattened = flatten(parseSetGroups);
+
+    return parseSetGroupsFlattened.filter((group: any) => {
+      return group.parseExercise.objectId === this.id;
+    });
+  }
+
+  get sessions() {
+    return this.exerciseGroupsFromWorkoutHistory;
+  }
+
+  async fetchExercise() {
+    try {
+      this.loading = true;
+      const query = new Parse.Query("ParseExercise");
+      const result = await query.get(this.id);
+      this.item = result.toJSON();
+    } catch (e) {
+      console.log("TODO show error notification");
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  created() {
+    this.fetchExercise();
+    // this.fetchExerciseHistory();
+    // this.checkIfUpdateRequired();
+    // this.getExerciseGroupsFromWorkoutHistory();
   }
 }
 </script>
@@ -219,7 +311,7 @@ export default class ExerciseShowView extends Vue {
 
 .chart {
   width: 100%;
-  height: 200px;
+  height: 400px;
 }
 
 .recordList {

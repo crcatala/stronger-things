@@ -1,32 +1,54 @@
 <template>
-  <div :class="$style.app">
+  <div :class="$style.app" v-if='storeLoaded'>
     <AppHeader v-if='currentUser' />
+    <UpdateChecker/>
     <transition name="route" mode="out-in">
       <router-view :key='$route.path' />
     </transition>
     <notifications group="main" position="bottom right" style='bottom: 16px; right: 16px;' />
     <modals-container class='app-modal-container' />
   </div>
+  <AppLoader v-else :visible='appLoaderVisible' />
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import AppHeader from "@/components/AppHeader.vue";
+import AppLoader from "@/components/AppLoader.vue";
+import UpdateChecker from "@/components/UpdateChecker.vue";
+import { setTimeout } from "timers";
 
 @Component({
   components: {
-    AppHeader
+    AppHeader,
+    UpdateChecker,
+    AppLoader
   },
   computed: {
     currentUser() {
-      console.log(this.$store.getters);
-      console.log(this.$store.getters["sessions/currentUser"]);
       return this.$store.getters["sessions/currentUser"];
     }
   }
 })
 export default class App extends Vue {
   test = "hey";
+  appLoaderVisible = false;
+  storeLoaded = false;
+
+  created() {
+    const self = this;
+    self.$store._vm.$root.$on("storageReady", () => {
+      console.log("storage ready!");
+      console.log("start vuex bootstrap end", Date.now());
+      this.storeLoaded = true;
+    });
+
+    // Don't show loader until at least 250s for better experience
+    setTimeout(() => {
+      console.log(this);
+      this.appLoaderVisible = true;
+    }, 250);
+  }
 }
 </script>
 

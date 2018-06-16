@@ -4,13 +4,15 @@
     <div :class='$style["item-subtitle"]'>{{ item.workoutRoutineName }}</div>
     <div :class='$style["item-subtitle"]'>{{ formattedDate(item.startedAt) }}</div>
     <div :class='{ [$style["item-title"]]: true, [$style.exercises]: true}' @click='toggleExercises'>
-      Exercises <span v-if='expanded'>(Expanded)</span><span v-else>(Collapsed)</span>
+      Exercises
+      <span v-if='expanded'>(Expanded)</span>
+      <span v-else>(Collapsed)</span>
     </div>
     <template v-if='expanded'>
       <div v-for='(exercise, exerciseIndex) in item.exercises' :key='exerciseIndex'>
         <div :class='$style["exercise-item"]'>
           <router-link :class='$style["exercise-link"]' :to='`/exercises/${exercise.exerciseId}`'>
-            {{ exercise.sets.length }} x  {{ exercise.name }}
+            {{ exercise.sets.length }} x {{ exercise.name }}
           </router-link>
           <div :class='$style["exercise-item--highlight"]'>Avg 1RM = {{ calculateAverage1RM(exercise.sets) }} lb</div>
         </div>
@@ -38,7 +40,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import Card from "@/components/Card.vue";
 import Http from "@/services/Http";
 import { format } from "date-fns";
-import { calculate1RM } from '@/services/LiftingCalculator.js';
+import { calculate1RM } from "@/services/LiftingCalculator";
 
 @Component({
   components: {
@@ -57,17 +59,19 @@ export default class WorkoutSessionCard extends Vue {
 
   calculateAverage1RM(sets: Array<any>) {
     // console.log(sets)
-    const setsWith1RM = sets.map((set) => {
-      return calculate1RM({weight: set.weight, rpe: set.rpe, reps: set.reps});
-    })
-    console.log(setsWith1RM)
-    const average = Math.round(setsWith1RM.reduce( ( p, c ) => p + c, 0 ) / setsWith1RM.length);
+    const setsWith1RM = sets.map(set => {
+      return calculate1RM({ weight: set.weight, rpe: set.rpe, reps: set.reps });
+    });
+    console.log(setsWith1RM);
+    const average = Math.round(
+      setsWith1RM.reduce((p, c) => p + c, 0) / setsWith1RM.length
+    );
     // console.log(test)
     return average;
   }
 
   toggleExercises() {
-    console.log('toggleExercises');
+    console.log("toggleExercises");
     this.$emit("toggleExercises", this.item);
   }
 }

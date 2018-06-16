@@ -1,7 +1,9 @@
 <template>
   <Card class='WorkoutRoutineItem' :class='$style["item-card"]'>
     <!-- <div :class='$style["item-title"]'>{{ item.name }}</div> -->
-    <div :class='$style["item-title"]'>{{ item.name }}</div>
+    <!-- <div :class='$style["item-title"]'>{{ item.name }}</div> -->
+    <div :class='$style["item-title"]'>{{ item.objectId }}</div>
+    <div :class='$style["item-subtitle"]'>Last updated {{ formattedDate(item.updatedAt) }}</div>
     <!-- <div :class='$style["item-subtitle"]'>{{ item.workoutRoutineName }}</div>
     <div :class='$style["item-subtitle"]'>{{ formattedDate(item.startedAt.iso) }}</div>
     <div :class='{ [$style["item-title"]]: true, [$style.exercises]: true}' @click='toggleExercises'>
@@ -15,7 +17,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { format } from "date-fns";
 import get from "lodash/get";
 import Card from "@/components/Card.vue";
-import { calculate1RM } from "@/services/LiftingCalculator.js";
+import { calculate1RM } from "@/services/LiftingCalculator";
 import { VTooltip } from "v-tooltip";
 
 @Component({
@@ -28,6 +30,10 @@ import { VTooltip } from "v-tooltip";
 })
 export default class WorkoutRoutineItem extends Vue {
   @Prop() private item!: object;
+
+  formattedDate(date: any) {
+    return format(date, "hh:mma, EEEE, MMMM dd y");
+  }
 }
 </script>
 

@@ -5,24 +5,27 @@
     <!-- <div :class='$style["item-subtitle"]'>{{ item.workoutRoutineName }}</div> -->
     <div :class='{ [$style["item-title"]]: true, [$style.exercises]: true}' @click='toggleExercises'>
       <!-- Exercises <span v-if='expanded'>(Expanded)</span><span v-else>(Collapsed)</span> -->
-      {{ formattedDate(item.startedAt.iso) }}
+      <!-- {{ formattedDate(item.startedAt.iso) }} -->
+      {{ formattedDate(item.createdAt) }}
     </div>
     <!-- <div :class='$style["item-subtitle"]'>{{ formattedDate(item.startedAt.iso) }}</div> -->
     <div :class='$style["exercise-item"]'>
       <router-link :class='$style["exercise-link"]' :to='getExerciseLinkPath(item)'>
-        {{ item.exerciseSets.length }} Sets
+        {{ item.parseSetsDictionary.length }} Sets
       </router-link>
-      <div :class='$style["exercise-item--highlight"]'>Avg 1RM = {{ calculateAverage1RM(item.exerciseSets) }} lb</div>
+      <!-- <div :class='$style["exercise-item--highlight"]'>Avg 1RM = {{ calculateAverage1RM(item.parseSetsDictionary) }} lb</div> -->
+      <ExerciseSetDetailsAverage :sets='item.parseSetsDictionary' />
     </div>
     <!-- <div :class='[$style["exercise-item"], $style["exercise-item--highlight"]]'>
       <div>Avg 1RM</div>
       <div>{{ calculateAverage1RM(exercise.sets) }} lb</div>
     </div> -->
 
-    <div :class='$style["exercise-item"]' v-for='(set, setIndex) in item.exerciseSets' :key='setIndex'>
+    <div :class='$style["exercise-item"]' v-for='(set, setIndex) in item.parseSetsDictionary' :key='setIndex'>
       <div>Set {{ setIndex + 1 }}</div>
       <!-- <div>{{ set.weight }} lb x {{ set.reps }} (RPE{{ set.rpe }})</div> -->
-      <div>{{ set.weight }} lb x {{ set.reps }}</div>
+      <!-- <div>{{ set.weight }} lb x {{ set.reps }}</div> -->
+      <ExerciseSetDetails :set='set' />
     </div>
   </Card>
 </template>
@@ -32,12 +35,17 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { format } from "date-fns";
 import get from "lodash/get";
 import Card from "@/components/Card.vue";
-import { calculate1RM } from "@/services/LiftingCalculator.js";
+import ExerciseSetDetails from "@/components/ExerciseSetDetails.vue";
+import ExerciseSetDetailsAverage from "@/components/ExerciseSetDetailsAverage.vue";
+import { calculate1RM } from "@/services/LiftingCalculator";
+// import { weightInPounds, distanceInMiles } from "@/services/UnitConversion";
 import { VTooltip } from "v-tooltip";
 
 @Component({
   components: {
-    Card
+    Card,
+    ExerciseSetDetails,
+    ExerciseSetDetailsAverage
   },
   directives: {
     tooltip: VTooltip
