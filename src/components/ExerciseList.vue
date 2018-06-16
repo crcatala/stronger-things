@@ -1,16 +1,16 @@
 <template>
   <div class='ExerciseList'>
     <Card>
-      <ExerciseItem  v-for='(item, index) in items' :key='index' :item='item'/>
+      <ExerciseItem v-for='(item, index) in items' :key='index' :item='item' />
     </Card>
   </div>
 </template>
 
 <script lang="ts">
-import get from 'lodash/get';
+import get from "lodash/get";
 import { Component, Prop, Vue } from "vue-property-decorator";
-import Card from '@/components/Card.vue'
-import ExerciseItem from '@/components/ExerciseItem.vue'
+import Card from "@/components/Card.vue";
+import ExerciseItem from "@/components/ExerciseItem.vue";
 
 @Component({
   components: {

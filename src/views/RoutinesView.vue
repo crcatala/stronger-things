@@ -41,7 +41,7 @@ export default class RoutinesView extends Vue {
   }
 
   created() {
-    this.fetchRoutines();
+    // this.fetchRoutines();
   }
 }
 </script>

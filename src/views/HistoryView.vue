@@ -81,8 +81,7 @@ export default class HistoryView extends Vue {
     //   return { ...x, expanded: false }
     // });
     // this.items = items;
-
-    this.fetchWorkoutSessions();
+    // this.fetchWorkoutSessions();
   }
 
   toggleExercises(item: any) {

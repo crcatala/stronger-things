@@ -182,10 +182,28 @@ export default class ExercisesView extends Vue {
     );
   }
 
-  async created() {
-    this.fetchCatgeories();
-    this.fetchBodyParts();
-    this.fetchExercises();
+  async fetchExercisesRedux() {
+    const query = new Parse.Query("ParseExercise");
+    query.equalTo("isGlobal", true);
+    query.doesNotExist("user");
+    query.ascending("name");
+    query.limit(1000);
+    try {
+      this.loading = true;
+      const results = await query.find();
+      console.log("exercises", results);
+      this.items = results.map((x: any) => x.toJSON());
+    } catch (e) {
+      console.log("TODO show error notification");
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  created() {
+    // this.fetchCatgeories();
+    // this.fetchBodyParts();
+    this.fetchExercisesRedux();
   }
 }
 </script>

@@ -8,10 +8,11 @@
       <div>
         <div :class='$style.title'>
           <span :class='$style.name'>{{ item.name }}</span>
-          <Chip fontSize='12px' background='#26C6DA' color='#ffffff' padding='4px 8px' v-if='isCustom'>Custom</Chip>
+          <!-- <Chip fontSize='12px' background='#26C6DA' color='#ffffff' padding='4px 8px' v-if='isCustom'>Custom</Chip> -->
         </div>
         <div :class='$style.description'>
-          {{ bodyPartName }} ({{ categoryName }})
+          {{ bodyPartName }} ({{ exerciseTypeName }})
+          <!-- {{ bodyPartName }} ({{ item.exerciseType }}) -->
         </div>
       </div>
     </div>
@@ -27,6 +28,17 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import get from "lodash/get";
 import AvatarText from "@/components/AvatarText.vue";
 import Chip from "@/components/Chip.vue";
+import { getExerciseBodyPartName } from "@/services/ExerciseBodyPart";
+import { getExerciseTypeName } from "@/services/ExerciseType";
+
+// {
+//   "name": "Leg Press",
+//   "exerciseType": 2,
+//   "isGlobal": true,
+//   "bodyParts": 16,
+//   "uniqueId": "A467F043-C96E-43C8-9133-A33EB8E62DED",
+//   "instructions": "Place feet shoulder width apart in a position where the knees would not pass the feet at the bottom of the leg press movement.||Push through the heel and midfoot and lower the safety bars, making sure to brace the core and keeping knees pointed slightly outward.||Lower the weight platform until the legs create a 90 degree angle.||Push using the quads to the starting position, making sure knees are not locked.||Repeat for reps.",
+// },
 
 @Component({
   components: {
@@ -50,11 +62,11 @@ export default class ExerciseItem extends Vue {
   }
 
   get bodyPartName() {
-    return get(this.item, "bodyPart.name");
+    return getExerciseBodyPartName(this.item.bodyParts);
   }
 
-  get categoryName() {
-    return get(this.item, "category.name");
+  get exerciseTypeName() {
+    return getExerciseTypeName(this.item.exerciseType);
   }
 }
 </script>

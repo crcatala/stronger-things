@@ -167,35 +167,24 @@ export default class ExerciseShowView extends Vue {
   }
 
   async created() {
-    try {
-      this.loading = true;
-      const query = new Parse.Query("Exercise");
-      query.include("bodyPart").include("category");
-      const item = await query.get(this.id);
-
-      const querySessions = new Parse.Query("ExerciseSession");
-
-      const exercise = new Parse.Object("Exercise", { id: item.id });
-      querySessions.descending("startedAt");
-      querySessions.equalTo("exercise", exercise);
-      const sessions = await querySessions.find();
-      console.log(sessions);
-      this.sessions = sessions.map((x: any) => x.toJSON());
-
-      // const promises = results.map((result: any) => {
-      //   const relation = result.relation("exerciseSessions")
-      //   const query = relation.query().include('exercise');
-      //   return query.find();
-      // })
-
-      // const exerciseSessionsResults: Array<object> = await Promise.all(promises);
-
-      this.item = item.toJSON();
-    } catch (e) {
-      console.log("error", e);
-    } finally {
-      this.loading = false;
-    }
+    // try {
+    //   this.loading = true;
+    //   const query = new Parse.Query("Exercise");
+    //   query.include("bodyPart").include("category");
+    //   const item = await query.get(this.id);
+    //   const querySessions = new Parse.Query("ExerciseSession");
+    //   const exercise = new Parse.Object("Exercise", { id: item.id });
+    //   querySessions.descending("startedAt");
+    //   querySessions.equalTo("exercise", exercise);
+    //   const sessions = await querySessions.find();
+    //   console.log(sessions);
+    //   this.sessions = sessions.map((x: any) => x.toJSON());
+    //   this.item = item.toJSON();
+    // } catch (e) {
+    //   console.log("error", e);
+    // } finally {
+    //   this.loading = false;
+    // }
   }
 }
 </script>
