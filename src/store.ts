@@ -2,13 +2,12 @@ import Parse from "@/services/Parse";
 import localForage from "localforage";
 import Vue from "vue";
 import Vuex from "vuex";
-// import createPersistedState from "vuex-persistedstate";
 import VuexPersistence from "vuex-persist";
 import sessions from "./store/sessions";
 import workouts from "./store/workouts";
 Vue.use(Vuex);
 
-window.localForage = localForage;
+// window.localForage = localForage;
 
 // Ensure clearing of store if no user
 if (!Parse.User.current()) {
@@ -27,7 +26,6 @@ const vuexPersistEmitter = () => {
   };
 };
 
-console.log("start vuex bootstrap", Date.now());
 const vuexLocal = new VuexPersistence({
   strictMode: true,
   asyncStorage: true,
@@ -43,8 +41,5 @@ export default new Vuex.Store({
   mutations: {
     RESTORE_MUTATION: vuexLocal.RESTORE_MUTATION
   },
-  // TODO: handle larger sets
-  // https://github.com/championswimmer/vuex-persist + localForage (asycn though)
-  // plugins: [createPersistedState({ paths: ["workouts.list"] })]
   plugins: [vuexLocal.plugin, vuexPersistEmitter()]
 });

@@ -27,15 +27,13 @@ export default class ExerciseSetDetailsAverage extends Vue {
   @Prop({
     default: false
   })
-  private valueOnly: boolean;
+  private valueOnly!: boolean;
 
   get emptySets() {
     return this.sets.length === 0;
   }
 
   get exerciseType() {
-    console.log(this.sets.length);
-    console.log(this.sets[0]);
     return this.sets[0].exerciseTypeValue;
   }
 

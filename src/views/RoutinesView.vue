@@ -4,7 +4,10 @@
     <div v-if='loading' :class='$style.loading'>
       <Spinner/>
     </div>
-    <WorkoutRoutineItem v-else v-for='(item, index) in items' :item='item' :key='index' />
+    <WorkoutRoutineItem v-else-if='items.length' v-for='(item, index) in items' :item='item' :key='index' />
+    <div v-else :class='$style.loading'>
+      <EmptyResults>No Routines</EmptyResults>
+    </div>
   </div>
 </template>
 
@@ -15,12 +18,14 @@ import Parse from "@/services/Parse";
 import { format } from "date-fns";
 import WorkoutRoutineItem from "@/components/WorkoutRoutineItem.vue";
 import Spinner from "@/components/Spinner.vue";
+import EmptyResults from "@/components/EmptyResults.vue";
 
 @Component({
   components: {
     Card,
     WorkoutRoutineItem,
-    Spinner
+    Spinner,
+    EmptyResults
   }
 })
 export default class RoutinesView extends Vue {
@@ -41,9 +46,12 @@ export default class RoutinesView extends Vue {
 
       const results = await query.find();
       this.items = results.map((x: any) => x.toJSON());
-      console.log("routines", this.items);
     } catch (e) {
-      console.log(e);
+      this.$notify({
+        group: "main",
+        type: "error",
+        title: "Error fetching routines."
+      });
     } finally {
       this.loading = false;
     }

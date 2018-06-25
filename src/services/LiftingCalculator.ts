@@ -8,8 +8,11 @@ function roundHalf(num: number): number {
 // https://www.athlegan.com/calculate-1rm
 // Brzycki formula
 //
-export function calculate1RM({ weight, rpe, reps } = {}) {
-  if (weight) {
+export function calculate1RM({
+  weight,
+  reps
+}: { weight?: number; reps?: number } = {}) {
+  if (weight && reps) {
     return Math.round(weight / (1.0278 - 0.0278 * reps));
   } else {
     return 0;
@@ -21,7 +24,6 @@ export function calculateAverage1RM(sets: Array<any>) {
   const setsWith1RM = sets.map(set => {
     return calculate1RM({
       weight: weightInPounds(set.kilograms || 0),
-      rpe: set.rpe,
       reps: set.reps || set.expectedReps
     });
   });

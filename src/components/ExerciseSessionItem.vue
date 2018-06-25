@@ -81,7 +81,7 @@ export default class ExerciseSessionItem extends Vue {
   calculateAverage1RM(sets: Array<any>) {
     // console.log(sets)
     const setsWith1RM = sets.map(set => {
-      return calculate1RM({ weight: set.weight, rpe: set.rpe, reps: set.reps });
+      return calculate1RM({ weight: set.weight, reps: set.reps });
     });
     console.log(setsWith1RM);
     const average = Math.round(

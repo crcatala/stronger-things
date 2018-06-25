@@ -1,19 +1,19 @@
 import Parse from "@/services/Parse";
 import get from "lodash/get";
 
-export default {
-  namespaced: true,
-  state: {
+function getInitialState() {
+  return {
     lastUpdateCheckedAt: new Date(0),
     updatedAt: new Date(0),
     mostRecentRemoteItem: null,
     list: []
-    //
-  },
+  };
+}
+
+export default {
+  namespaced: true,
+  state: getInitialState(),
   getters: {
-    // mostRecentRemoteItem(state) {
-    //   return state.mostRecentRemoteItem;
-    // }
     isUpToDate(state) {
       const remoteDate = new Date(
         get(state, "mostRecentRemoteItem.createdAt", null)
@@ -27,6 +27,13 @@ export default {
     }
   },
   mutations: {
+    reset(state) {
+      const initialState = getInitialState();
+
+      for (let f in state) {
+        state[f] = initialState[f];
+      }
+    },
     setList(state, val) {
       state.list = val;
     },
@@ -38,47 +45,29 @@ export default {
     }
   },
   actions: {
-    // async login({ commit }, { username = "", password = "" } = {}) {
-    //   const user = await Parse.User.logIn(username, password);
-    //   commit("setCurrentUser", user.toJSON());
-    //   return user;
-    // },
-
+    reset({ commit }) {
+      commit("reset");
+    },
     async refreshList({ dispatch }) {
-      console.log("refreshList action");
       dispatch("checkForUpdates");
-      // await checkForUpdates
-      // await getList
     },
     async getList() {
       // TODO:
     },
-
-    async checkForUpdates({ commit, dispatch, getters }) {
-      console.log("checkForUpdates action");
+    async checkForUpdates({ commit, getters }) {
       const query = new Parse.Query("ParseWorkout");
       query.select([""]);
       query.limit(1);
       const user = Parse.User.current();
       query.equalTo("user", user);
       query.equalTo("isHidden", 0);
-      // Should we do by createdAt or updatedAt instead which are native?
-      // because we already have all data and can sort client-side by completionDate
-      // query.descending("completionDate");
-      // Is it faster to get all 1000 items withous sort? Sorting seems slow for certain queries...
-      // TODO/QUESTION: Not sure what background jobs are happening that updates workouts
-      // Because saw that several were updated at today, but never edited.
-      // For now we will check createdAt -- knowing that it's not long-term accurate solution
       query.descending("createdAt");
 
       const results = await query.find();
 
       const items = results.map(x => x.toJSON());
-      console.log("checkForUpdates", items);
       commit("setMostRecentRemoteItem", items[0] || null);
       commit("setLastUpdateCheckedAt");
-
-      console.log("getters.isUpToDate", getters.isUpToDate);
 
       if (getters.isUpToDate) {
         console.log("Up to date, skipping fetching of workouts...");
@@ -101,7 +90,7 @@ export default {
 
       const workoutItems = workouts.map(x => x.toJSON());
       commit("setList", workoutItems);
-      console.log("getters.isUpToDate after", getters.isUpToDate);
+      // console.log("getters.isUpToDate after", getters.isUpToDate);
     }
   }
 };

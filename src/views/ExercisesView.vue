@@ -5,7 +5,7 @@
       <div>
         <InputField placeholder='Search...' v-model='searchInput' :class='$style.input' @submit='search' autoSubmit clearable/>
       </div>
-      <AppButton @click.native='newClicked'>New</AppButton>
+      <ExerciseCreateAction/>
     </div>
     <div :class='$style.filters'>
       <div>
@@ -22,7 +22,8 @@
     </div>
     <ExerciseList :items='filteredItems' v-else-if='filteredItems.length' />
     <div v-else :class='$style.loading'>
-      <EmptyResults/>
+      <EmptyResults v-if='searchFilter'>No Results Matching Filter</EmptyResults>
+      <EmptyResults v-else>No Exercises</EmptyResults>
     </div>
   </div>
 </template>
@@ -33,14 +34,12 @@ import get from "lodash/get";
 import Multiselect from "@/components/Multiselect";
 import SingleSelect from "@/components/SingleSelect.vue";
 import ExerciseList from "@/components/ExerciseList.vue";
-import AppButton from "@/components/AppButton.vue";
+import ExerciseCreateAction from "@/components/ExerciseCreateAction.vue";
 import InputField from "@/components/InputField.vue";
 import Spinner from "@/components/Spinner.vue";
 import EmptyResults from "@/components/EmptyResults.vue";
-import ExerciseNew from "@/components/ExerciseNew.vue";
 import { EXERCISE_BODY_PART_OPTIONS } from "@/services/ExerciseBodyPart";
 import { EXERCISE_TYPE_OPTIONS } from "@/services/ExerciseType";
-import Http from "@/services/Http";
 import Parse from "@/services/Parse";
 
 @Component({
@@ -48,11 +47,10 @@ import Parse from "@/services/Parse";
     Multiselect,
     SingleSelect,
     ExerciseList,
-    AppButton,
+    ExerciseCreateAction,
     InputField,
     Spinner,
-    EmptyResults,
-    ExerciseNew
+    EmptyResults
   }
 })
 export default class ExercisesView extends Vue {
@@ -120,36 +118,7 @@ export default class ExercisesView extends Vue {
     this.exerciseTypeFilter = item;
   }
 
-  closeModal() {
-    // console.log("closeModal");
-    this.$modal.hide("ExerciseNew");
-  }
-
-  newClicked() {
-    // this.$modal.show(MyComponent, {
-    //   text: 'This text is passed as a property'
-    // }, {
-    //   draggable: true
-    // })
-    const onSuccess = () => {
-      console.log("success callback");
-      console.log(this);
-      this.closeModal();
-    };
-    this.$modal.show(
-      ExerciseNew,
-      {
-        text: "This text is passed as a property",
-        onSuccess
-      },
-      {
-        name: "ExerciseNew",
-        height: "auto"
-      }
-    );
-  }
-
-  async fetchExercisesRedux() {
+  async fetchExercises() {
     const query = new Parse.Query("ParseExercise");
     query.equalTo("isGlobal", true);
     query.doesNotExist("user");
@@ -158,7 +127,6 @@ export default class ExercisesView extends Vue {
     try {
       this.loading = true;
       const results = await query.find();
-      // console.log("exercises", results);
       this.items = results.map((x: any) => x.toJSON());
     } catch (e) {
       console.log("TODO show error notification");
@@ -168,9 +136,7 @@ export default class ExercisesView extends Vue {
   }
 
   created() {
-    // this.fetchCatgeories();
-    // this.fetchBodyParts();
-    this.fetchExercisesRedux();
+    this.fetchExercises();
   }
 }
 </script>

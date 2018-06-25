@@ -44,10 +44,10 @@ import DumbbellIcon from "@/assets/icons/dumbbell.svg";
   }
 })
 export default class ExercisePersonalRecords extends Vue {
-  @Prop() private oneRepMax!: string;
-  @Prop() private weight!: string;
-  @Prop() private reps!: string;
-  @Prop() private volume!: string;
+  @Prop() private oneRepMax!: number;
+  @Prop() private weight!: number;
+  @Prop() private reps!: number;
+  @Prop() private volume!: number;
   @Prop({
     default: "kg"
   })

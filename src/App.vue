@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.app" v-if='storeLoaded'>
     <AppHeader v-if='currentUser' />
-    <UpdateChecker/>
+    <!-- <UpdateChecker/> -->
     <transition name="route" mode="out-in">
       <router-view :key='$route.path' />
     </transition>
@@ -11,45 +11,42 @@
   <AppLoader v-else :visible='appLoaderVisible' />
 </template>
 
-<script lang="ts">
+<script>
 import { Component, Vue } from "vue-property-decorator";
 import AppHeader from "@/components/AppHeader.vue";
 import AppLoader from "@/components/AppLoader.vue";
 import UpdateChecker from "@/components/UpdateChecker.vue";
 import { setTimeout } from "timers";
 
-@Component({
+export default {
   components: {
     AppHeader,
     UpdateChecker,
     AppLoader
   },
+  data() {
+    return {
+      test: "hey",
+      appLoaderVisible: true,
+      storeLoaded: false
+    };
+  },
   computed: {
     currentUser() {
       return this.$store.getters["sessions/currentUser"];
     }
-  }
-})
-export default class App extends Vue {
-  test = "hey";
-  appLoaderVisible = false;
-  storeLoaded = false;
-
+  },
   created() {
-    const self = this;
-    self.$store._vm.$root.$on("storageReady", () => {
-      console.log("storage ready!");
-      console.log("start vuex bootstrap end", Date.now());
+    this.$store._vm.$root.$on("storageReady", () => {
       this.storeLoaded = true;
     });
 
     // Don't show loader until at least 250s for better experience
-    setTimeout(() => {
-      console.log(this);
-      this.appLoaderVisible = true;
-    }, 250);
+    // setTimeout(() => {
+    //   this.appLoaderVisible = true;
+    // }, 250);
   }
-}
+};
 </script>
 
 <style lang="scss" module>

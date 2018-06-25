@@ -1,26 +1,30 @@
 <template>
-  <div class='HistoryView' :class='$style.root'>
+  <div :class='$style.HistoryView'>
     <h1>History</h1>
     <div v-if='loading' :class='$style.loading'>
       <Spinner/>
     </div>
-    <template v-else>
+    <div v-else-if='items.length'>
       <div :class='$style.filters'>
         <div :class='$style.expansionToggle' v-if='expandAll' @click='collapseItems'>Collapse All</div>
         <div :class='$style.expansionToggle' v-else @click='expandItems'>Expand All</div>
       </div>
       <WorkoutSessionItem :class='$style["item-card"]' v-for='(item, index) in filteredItems' :key='index' :item='item' :expanded='item.expanded' @toggleExercises='toggleExercises(item)' />
-      <div :class='$style.viewMore' v-if='filteredItems.length < items.length' @click='viewMore'>View More</div>
-    </template>
+      <div :class='$style.viewMore' v-if='filteredItems.length && filteredItems.length < items.length' @click='viewMore'>View More</div>
+    </div>
+    <div v-else :class='$style.loading'>
+      <EmptyResults>No Workouts</EmptyResults>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Parse from "@/services/Parse";
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Watch, Vue } from "vue-property-decorator";
 import WorkoutSessionCard from "@/components/WorkoutSessionCard.vue";
 import WorkoutSessionItem from "@/components/WorkoutSessionItem.vue";
 import Spinner from "@/components/Spinner.vue";
+import EmptyResults from "@/components/EmptyResults.vue";
 import Http from "@/services/Http";
 import { format } from "date-fns";
 
@@ -29,18 +33,22 @@ const PAGE_INVERVAL = 25;
 @Component({
   components: {
     Spinner,
+    EmptyResults,
     WorkoutSessionCard,
     WorkoutSessionItem
   }
 })
 export default class HistoryView extends Vue {
-  // items: Array<any> = [];
   workoutSessions: Array<any> = [];
   loading = false;
   filteredItems = [];
   expandAll = false;
 
-  // TODO: watch items and refresh filteredItems and count
+  @Watch("items")
+  itemsChanged() {
+    this.viewMore();
+  }
+
   get items() {
     // clone because we mutate with `expanded` state and odd persisted state otherwise
     const list = this.$store.getters["workouts/list"];
@@ -103,10 +111,6 @@ export default class HistoryView extends Vue {
       .include("parseRoutine")
       .include("parseSetGroups.parseExercise");
     query.limit(10);
-    // 10 records -> 2seconds 90k
-    // 100 records -> 33seconds 900k
-    // console.log(this.currentUser);
-    // TODO: there's gotta be a way to reference currentUser directly
     const user = new Parse.Object("_User", { id: this.currentUser.objectId });
     query.equalTo("user", user);
     query.equalTo("isHidden", 0);
@@ -115,34 +119,6 @@ export default class HistoryView extends Vue {
     const results = await query.find();
 
     const items = results.map((x: any) => x.toJSON());
-    this.items = items;
-
-    console.log("workouts", items);
-    // {
-    //   "where": {
-    //     "user": {
-    //       "__type": "Pointer",
-    //       "className": "User",
-    //       "objectId": "Nu3qpkeC1u"
-    //     }
-    //   },
-    //   "include": "parseOriginRoutine,parseRoutine,parseSetGroups.parseExercise",
-    //   "limit": 10,
-    //   "_method": "GET",
-    //   "_ApplicationId": "QbtVgYzi9iU1GNBFaGs6rPT0XtvRKMajvuYLLmTW",
-    //   "_ClientVersion": "js1.11.1",
-    //   "_InstallationId": "5ba7cb91-6d8e-f29b-8be2-70279cacd673",
-    //   "_SessionToken": "r:3dfefd64275b1a7d60439c1516128687"
-    // }
-    //     "include": "parseOriginRoutine,parseRoutine,parseSetGroups.parseExercise",
-    // "limit": "1000",
-    // "where": {
-    //   "user": {
-    //     "__type": "Pointer",
-    //     "className": "_User",
-    //     "objectId": "Nu3qpkeC1u"
-    //   }
-    // }
   }
 
   async checkIfUpdateRequired() {
@@ -150,25 +126,14 @@ export default class HistoryView extends Vue {
     // query.select(["completionDate"]);
     query.select([""]);
     query.limit(1);
-    // 1 records -> 150ms 1k
-    // 10 records -> 150ms 2.2k
-    // 100 records -> 300ms 17k
-    // 500 records -> 350ms 67k
-    // (somtimes slow but usually no more than 2 seconds)
-    // console.log(this.currentUser);
-    // TODO: there's gotta be a way to reference currentUser directly
     const user = new Parse.Object("_User", { id: this.currentUser.objectId });
     query.equalTo("user", user);
     query.equalTo("isHidden", 0);
-    // Should we do by createdAt or updatedAt instead which are native?
-    // because we already have all data and can sort client-side by completionDate
-    // query.descending("completionDate");
     query.descending("updatedAt");
 
     const results = await query.find();
 
     const items = results.map((x: any) => x.toJSON());
-    // this.items = items;
 
     console.log("checkIfUpdateRequired", items);
   }
@@ -181,7 +146,6 @@ export default class HistoryView extends Vue {
   }
 
   expandItems() {
-    console.log("expandItems");
     this.filteredItems.forEach((item: any) => {
       item.expanded = true;
     });
@@ -189,7 +153,6 @@ export default class HistoryView extends Vue {
   }
 
   collapseItems() {
-    console.log("collapseItems");
     this.filteredItems.forEach((item: any) => {
       item.expanded = false;
     });
@@ -197,15 +160,11 @@ export default class HistoryView extends Vue {
   }
 
   created() {
-    // this.fetchWorkouts();
-    // this.checkIfUpdateRequired();
-    console.log("HistoryView created");
     this.$store.dispatch("workouts/refreshList");
-    this.filteredItems = this.items.slice(0, PAGE_INVERVAL);
+    this.viewMore();
   }
 
   toggleExercises(item: any) {
-    console.log("HistoryView toggleExercises", item);
     item.expanded = !item.expanded;
   }
 }
@@ -214,7 +173,7 @@ export default class HistoryView extends Vue {
 <style lang='scss' module>
 @import "@/styles/variables.scss";
 
-.root {
+.HistoryView {
   padding: 0 $app-content-gutter-spacing;
   margin-bottom: 48px;
 }
@@ -233,39 +192,6 @@ export default class HistoryView extends Vue {
   }
 }
 
-.item-title {
-  font-size: 1.4em;
-  color: $color-grey-dark;
-}
-
-.item-subtitle {
-  font-size: 1em;
-  color: $color-grey;
-}
-
-.exercises {
-  margin-top: 16px;
-  margin-bottom: 4px;
-}
-
-.exercise-item {
-  max-width: 360px;
-  font-size: 1em;
-  color: $color-grey;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-
-  &:last-child {
-    margin-bottom: 4px;
-  }
-}
-
-.exercise-link {
-  text-decoration: none;
-  color: $color-grey;
-}
-
 .viewMore {
   padding: 16px;
   background-color: $color-grey-lighter;
@@ -273,6 +199,12 @@ export default class HistoryView extends Vue {
   cursor: pointer;
   text-align: center;
   text-transform: uppercase;
+  transition: $swift-ease-out;
+  transition-property: color, background-color;
+
+  &:hover {
+    background-color: darken($color-grey-lighter, 10%);
+  }
 }
 
 .filters {

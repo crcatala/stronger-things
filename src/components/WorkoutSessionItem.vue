@@ -107,8 +107,8 @@ export default class WorkoutSessionItem extends Vue {
   get formattedDate() {
     // TODO: not sure if to use completionDate or something else
     // because not all workouts have completionDate (some data integrity or old builds perhaps?)
-    if (this.item.createdAt) {
-      return format(this.item.createdAt, "hh:mma, EEEE, MMMM dd y");
+    if (get(this, "item.createdAt")) {
+      return format(get(this, "item.createdAt"), "hh:mma, EEEE, MMMM dd y");
     } else {
       return null;
     }
@@ -119,7 +119,6 @@ export default class WorkoutSessionItem extends Vue {
   }
 
   toggleExercises() {
-    console.log("toggleExercises", this.item);
     this.$emit("toggleExercises", this.item);
   }
 
@@ -128,27 +127,21 @@ export default class WorkoutSessionItem extends Vue {
     const recentSessions = this.parseSetGroups
       .filter((x: any) => x.parseExercise.objectId === exerciseId)
       .slice(1, 6);
-    // TOOD: ooof so scrolling in history, we need to find appropriate start date...
+    // TODO: ooof so scrolling in history, we need to find appropriate start date...
     // maybe do a filter on date > or < the date
     // "days ago" should mean days prior/relative to the current viewed workout
     // Note that slice ignores first one because that's the current workout
 
-    // recentSession.parseSetsDictionary;
     return recentSessions;
   }
 
-  timeAgo(date) {
+  timeAgo(date: string) {
     return formatDistanceStrict(date, new Date(), {
       addSuffix: true,
       unit: "day"
     });
   }
-  // created() {
-  //   console.log("WorkoutSessionItem", this.item.objectId);
-  // }
 }
-
-WorkoutSessionItem.prototype.calculateAverage1RM = calculateAverage1RM;
 </script>
 
 <style lang="scss" module>

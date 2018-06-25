@@ -58,15 +58,12 @@ export default class WorkoutSessionCard extends Vue {
   }
 
   calculateAverage1RM(sets: Array<any>) {
-    // console.log(sets)
     const setsWith1RM = sets.map(set => {
-      return calculate1RM({ weight: set.weight, rpe: set.rpe, reps: set.reps });
+      return calculate1RM({ weight: set.weight, reps: set.reps });
     });
-    console.log(setsWith1RM);
     const average = Math.round(
       setsWith1RM.reduce((p, c) => p + c, 0) / setsWith1RM.length
     );
-    // console.log(test)
     return average;
   }
 

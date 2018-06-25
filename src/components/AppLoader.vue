@@ -1,13 +1,17 @@
 <template>
   <div :class='$style.AppLoader'>
-    <div v-if='visible'>Loading...</div>
-    <!-- <div>Loading...</div> -->
+    <Spinner v-if='visible' />
   </div>
 </template>
 
 <script>
+import Spinner from "@/components/Spinner.vue";
+
 export default {
   name: "AppLoader",
+  components: {
+    Spinner
+  },
   props: {
     visible: {
       type: Boolean,
