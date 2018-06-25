@@ -10,6 +10,7 @@
           {{ bodyPartName }} ({{ categoryName }})
         </span>
       </h1>
+      <ExerciseInstructionsCard :instructions='item.instructions' />
       <template v-if='sessions.length'>
         <div :class='$style.recordList'>
           <div :class='[$style.record, $style.record6]'>
@@ -64,6 +65,7 @@ import maxBy from "lodash/maxBy";
 import max from "lodash/max";
 import flatten from "lodash/flatten";
 import Card from "@/components/Card.vue";
+import ExerciseInstructionsCard from "@/components/ExerciseInstructionsCard.vue";
 import ExerciseSessionItem from "@/components/ExerciseSessionItem.vue";
 import ExerciseHistoryChart from "@/components/ExerciseHistoryChart.vue";
 import EmptyResults from "@/components/EmptyResults.vue";
@@ -81,6 +83,7 @@ import DumbbellIcon from "@/assets/icons/dumbbell.svg";
   components: {
     Spinner,
     Card,
+    ExerciseInstructionsCard,
     ExerciseSessionItem,
     ExerciseHistoryChart,
     TrophyIcon,
@@ -169,68 +172,17 @@ export default class ExerciseShowView extends Vue {
     try {
       this.loading = true;
       const query = new Parse.Query("ParseSetGroup");
-      // query.include("user");
-      // const user = new Parse.Object("_User", { id: this.currentUser.objectId });
-      // const exercise = new Parse.Object("ParseExercise", { id: this.id });
-      // query.equalTo("isHidden", 0);
-      // query.equalTo("user", Parse.User.current());
-      // query.equalTo("parseExercise", exercise);
-      // query.descending("completionDate");
-
-      // filtering by user is slow 15seconds
-      // --> ahah if include user gets to 2 seconds (still kind of slow tho)
-      //  --> oh wait nm it doesnt matter. sometimes 15 seconds, sometimes not hmmm
-      // filtering by exercise is quick though hmmm
-      // filtering by isHidden is quick
-      // ordering by completionDate fails! times out
-      // Always varies, sometimes super slow even if filtering just by exercise
-      // I have theories....
-      // i think backend is caching queries or something
-      // and since so many users worlwide, updating a table could bust cache, and subsequent queries need to be rerun
-      //
       query.limit(1);
 
       const results = await query.find();
       const items = results.map((x: any) => x.toJSON());
       console.log("exercise history", items);
-      // this.sessions = sessions.map((x: any) => x.toJSON());
-      // this.item = item.toJSON();
     } catch (e) {
       console.log("error", e);
     } finally {
       this.loading = false;
     }
   }
-
-  // async checkIfUpdateRequired() {
-  //   if (!Parse.User.current()) {
-  //     return;
-  //   }
-  //   // OOOOOFFF this is slow and never got results even plucking no extra
-  //   // attributes and limiting to 1!
-  //   // ---> guessing because the sheer volume of records for ParseSetGroup is so large (at least 10x that of a Workout)
-  //   const query = new Parse.Query("ParseSetGroup");
-  //   query.select([""]);
-  //   query.limit(1);
-  //   // 1 records -> 150ms 1k
-  //   // 10 records -> 150ms 2.2k
-  //   // 100 records -> 300ms 17k
-  //   // 500 records -> 350ms 67k
-  //   // const user = new Parse.Object("_User", { id: this.currentUser.objectId });
-  //   // query.equalTo("user", user);
-  //   // query.equalTo("isHidden", 0);
-  //   // Should we do by createdAt or updatedAt instead which are native?
-  //   // because we already have all data and can sort client-side by completionDate
-  //   // query.descending("completionDate");
-  //   // query.descending("updatedAt");
-
-  //   const results = await query.find();
-
-  //   const items = results.map((x: any) => x.toJSON());
-  //   // this.items = items;
-
-  //   console.log("checkIfUpdateRequired", items);
-  // }
 
   get bodyPartName() {
     return getExerciseBodyPartName(this.item.bodyParts);
@@ -291,6 +243,10 @@ export default class ExerciseShowView extends Vue {
 
 .ExerciseShowView {
   padding: 0 $app-content-gutter-spacing;
+}
+
+.instructions {
+  padding: 16px;
 }
 
 .summary {
