@@ -12,35 +12,7 @@
       </h1>
       <ExerciseInstructionsCard :instructions='item.instructions' />
       <template v-if='sessions.length'>
-        <div :class='$style.recordList'>
-          <div :class='[$style.record, $style.record6]'>
-            <TrophyIcon :class='$style.recordIcon' />
-            <div>
-              <div :class='$style.recordValue'>{{ record1RM }}
-                <span :class='$style.recordSubtitle'>lbs</span>
-              </div>
-              <div :class='$style.recordLabel'>1 Rep Max</div>
-            </div>
-          </div>
-          <div :class='[$style.record, $style.record7]'>
-            <MedalIcon :class='$style.recordIcon' />
-            <div>
-              <div :class='$style.recordValue'>{{ recordWeight }}
-                <span :class='$style.recordSubtitle'>lbs x {{ recordReps }}</span>
-              </div>
-              <div :class='$style.recordLabel'>Record Weight</div>
-            </div>
-          </div>
-          <div :class='[$style.record, $style.record8]'>
-            <DumbbellIcon :class='$style.recordIcon' />
-            <div>
-              <div :class='$style.recordValue'>{{ recordVolume }}
-                <span :class='$style.recordSubtitle'>lbs</span>
-              </div>
-              <div :class='$style.recordLabel'>Record Volume</div>
-            </div>
-          </div>
-        </div>
+        <ExercisePersonalRecords :oneRepMax='record1RM' :weight='recordWeight' :rep='recordReps' :volume='recordVolume' />
         <Card :class='$style.summary'>
           <div :class='$style.chartContainer'>
             <ExerciseHistoryChart v-if='xAxisData.length' :class='$style.chart' :xAxisData='xAxisData' :chartData='chartData' />
@@ -66,6 +38,7 @@ import max from "lodash/max";
 import flatten from "lodash/flatten";
 import Card from "@/components/Card.vue";
 import ExerciseInstructionsCard from "@/components/ExerciseInstructionsCard.vue";
+import ExercisePersonalRecords from "@/components/ExercisePersonalRecords.vue";
 import ExerciseSessionItem from "@/components/ExerciseSessionItem.vue";
 import ExerciseHistoryChart from "@/components/ExerciseHistoryChart.vue";
 import EmptyResults from "@/components/EmptyResults.vue";
@@ -75,20 +48,15 @@ import { getExerciseBodyPartName } from "@/services/ExerciseBodyPart";
 import Parse from "@/services/Parse";
 import { calculateAverage1RM } from "@/services/LiftingCalculator";
 import { weightInPounds } from "@/services/UnitConversion";
-import TrophyIcon from "@/assets/icons/trophy.svg";
-import MedalIcon from "@/assets/icons/medal.svg";
-import DumbbellIcon from "@/assets/icons/dumbbell.svg";
 
 @Component({
   components: {
     Spinner,
     Card,
     ExerciseInstructionsCard,
+    ExercisePersonalRecords,
     ExerciseSessionItem,
     ExerciseHistoryChart,
-    TrophyIcon,
-    MedalIcon,
-    DumbbellIcon,
     EmptyResults
   }
 })
