@@ -1,46 +1,55 @@
 <template>
-  <Card class='WorkoutSessionItem' :class='$style["item-card"]'>
+  <Card class='WorkoutSessionItem'
+        :class='$style["item-card"]'>
     <div :class='$style["item-title"]'>{{ item.name }}</div>
-    <!-- <div :class='$style["item-title"]'>{{ item.workoutRoutine.name }}</div> -->
-    <!-- <div :class='$style["item-subtitle"]'>{{ item.workoutRoutineName }}</div> -->
     <div :class='$style["item-subtitle"]'>{{ formattedDate }}</div>
-    <!-- TODO: duration can be computed from completionDate and startDate -->
-    <!-- <div :class='$style["item-subtitle"]'>{{ formattedDate(item.startDate.iso) }}</div> -->
-    <div :class='{ [$style["item-title"]]: true, [$style.exercises]: true}' @click='toggleExercises'>
+    <div :class='{ [$style["item-title"]]: true, [$style.exercises]: true}'
+         @click='toggleExercises'>
       Exercises
-      <!-- <span v-if='expanded'>(Expanded)</span>
-      <span v-else>(Collapsed)</span> -->
-      <ChevronUpIcon v-if='expanded' :class='$style.expandIcon' />
-      <ChevronDownIcon v-else :class='$style.expandIcon' />
+      <ChevronUpIcon v-if='expanded'
+                     :class='$style.expandIcon' />
+      <ChevronDownIcon v-else
+                       :class='$style.expandIcon' />
     </div>
     <div v-show='expanded'>
-      <div v-for='(parseSetGroup, parseSetGroupsIndex) in item.parseSetGroups' :key='`expanded--${parseSetGroupsIndex}`' :class='$style.expandedSetGroupWrapper'>
+      <div v-for='(parseSetGroup, parseSetGroupsIndex) in item.parseSetGroups'
+           :key='`expanded--${parseSetGroupsIndex}`'
+           :class='$style.expandedSetGroupWrapper'>
         <div :class='$style.expandedSetGroupWrapperLeft'>
           <div :class='$style["exercise-item--expanded"]'>
-            <router-link :class='$style["exercise-link--expanded"]' :to='getExerciseLinkPath(parseSetGroup)'>
+            <router-link :class='$style["exercise-link--expanded"]'
+                         :to='getExerciseLinkPath(parseSetGroup)'>
               {{ parseSetGroup.parseSetsDictionary.length }} x {{ parseSetGroup.parseExercise.name }}
             </router-link>
             <ExerciseSetDetailsAverage :sets='parseSetGroup.parseSetsDictionary' />
           </div>
 
-          <div :class='[$style["exercise-item"]]' v-for='(set, setIndex) in parseSetGroup.parseSetsDictionary' :key='setIndex'>
+          <div :class='[$style["exercise-item"]]'
+               v-for='(set, setIndex) in parseSetGroup.parseSetsDictionary'
+               :key='setIndex'>
             <div>Set {{ setIndex + 1 }}</div>
             <ExerciseSetDetails :set='set' />
           </div>
         </div>
         <div :class='$style.historyWrapper'>
-          <div :class='$style.historyItem' v-for='parseSetGroup in historyForExercise(parseSetGroup.parseExercise.objectId)'>
-            <ExerciseSetDetailsAverage :sets='parseSetGroup.parseSetsDictionary' valueOnly />
+          <div :class='$style.historyItem'
+               v-for='(parseSetGroup, historyIndex) in historyForExercise(parseSetGroup.parseExercise.objectId)'
+               :key='historyIndex'>
+            <ExerciseSetDetailsAverage :sets='parseSetGroup.parseSetsDictionary'
+                                       valueOnly />
             <span :class='$style.timeAgo'>({{ timeAgo(parseSetGroup.createdAt) }})</span>
           </div>
-          <!-- {{ historyForExercise(parseSetGroup.parseExercise.objectId).length }} More Stuff ============= -->
         </div>
       </div>
     </div>
     <div v-show='!expanded'>
-      <div :class='$style["exercise-item"]' v-for='(parseSetGroup, parseSetGroupsIndex) in item.parseSetGroups' :key='`collapsed--${parseSetGroupsIndex}`'>
-        <router-link :class='$style["exercise-link"]' :to='getExerciseLinkPath(parseSetGroup)'>{{ parseSetGroup.parseSetsDictionary.length }} x {{ parseSetGroup.parseExercise.name }}</router-link>
-        <ExerciseSetDetails v-if='parseSetGroup.parseSetsDictionary[0]' :set='parseSetGroup.parseSetsDictionary[0]' />
+      <div :class='$style["exercise-item"]'
+           v-for='(parseSetGroup, parseSetGroupsIndex) in item.parseSetGroups'
+           :key='`collapsed--${parseSetGroupsIndex}`'>
+        <router-link :class='$style["exercise-link"]'
+                     :to='getExerciseLinkPath(parseSetGroup)'>{{ parseSetGroup.parseSetsDictionary.length }} x {{ parseSetGroup.parseExercise.name }}</router-link>
+        <ExerciseSetDetails v-if='parseSetGroup.parseSetsDictionary[0]'
+                            :set='parseSetGroup.parseSetsDictionary[0]' />
         <div v-else>No Sets Peformed</div>
       </div>
     </div>
@@ -89,19 +98,6 @@ export default class WorkoutSessionItem extends Vue {
 
   get workouts() {
     return this.$store.getters["workouts/list"];
-  }
-
-  get linkPath() {
-    // return { name: "ExerciseShowView", params: { id: this.item.objectId }}
-    return "/";
-  }
-
-  get bodyPartName() {
-    return get(this.item, "bodyPart.name");
-  }
-
-  get categoryName() {
-    return get(this.item, "category.name");
   }
 
   get formattedDate() {

@@ -1,13 +1,16 @@
 <template>
-  <transition name='backdrop' mode='out-in'>
-    <div class='backdrop' :class='$style.backdrop' @click='$emit("close")'></div>
+  <transition name='backdrop'
+              mode='out-in'>
+    <div class='backdrop'
+         :class='$style.backdrop'
+         @click='$emit("close")'></div>
   </transition>
 </template>
 
 <script>
 export default {
-  name: 'Backdrop'
-}
+  name: "Backdrop"
+};
 </script>
 
 <style lang='scss' module>
@@ -18,10 +21,8 @@ export default {
   width: 100%;
   height: 100%;
   z-index: 1000;
-  // background-color: $color-grey;
   background-color: #486997;
   opacity: 0.25;
-  // transition: opacity 0.25s ease-in-out;
 }
 </style>
 

@@ -1,30 +1,21 @@
 <template>
-  <Card class='ExerciseSessionItem' :class='$style["item-card"]'>
-    <!-- <div :class='$style["item-title"]'>{{ item.name }}</div> -->
-    <!-- <div :class='$style["item-title"]'>{{ item.workoutRoutine.name }}</div> -->
-    <!-- <div :class='$style["item-subtitle"]'>{{ item.workoutRoutineName }}</div> -->
-    <div :class='{ [$style["item-title"]]: true, [$style.exercises]: true}' @click='toggleExercises'>
-      <!-- Exercises <span v-if='expanded'>(Expanded)</span><span v-else>(Collapsed)</span> -->
-      <!-- {{ formattedDate(item.startedAt.iso) }} -->
+  <Card class='ExerciseSessionItem'
+        :class='$style["item-card"]'>
+    <div :class='{ [$style["item-title"]]: true, [$style.exercises]: true}'
+         @click='toggleExercises'>
       {{ formattedDate(item.createdAt) }}
     </div>
-    <!-- <div :class='$style["item-subtitle"]'>{{ formattedDate(item.startedAt.iso) }}</div> -->
     <div :class='$style["exercise-item"]'>
-      <router-link :class='$style["exercise-link"]' :to='getExerciseLinkPath(item)'>
+      <span :class='$style["exercise-link"]'>
         {{ item.parseSetsDictionary.length }} Sets
-      </router-link>
-      <!-- <div :class='$style["exercise-item--highlight"]'>Avg 1RM = {{ calculateAverage1RM(item.parseSetsDictionary) }} lb</div> -->
+      </span>
       <ExerciseSetDetailsAverage :sets='item.parseSetsDictionary' />
     </div>
-    <!-- <div :class='[$style["exercise-item"], $style["exercise-item--highlight"]]'>
-      <div>Avg 1RM</div>
-      <div>{{ calculateAverage1RM(exercise.sets) }} lb</div>
-    </div> -->
 
-    <div :class='$style["exercise-item"]' v-for='(set, setIndex) in item.parseSetsDictionary' :key='setIndex'>
+    <div :class='$style["exercise-item"]'
+         v-for='(set, setIndex) in item.parseSetsDictionary'
+         :key='setIndex'>
       <div>Set {{ setIndex + 1 }}</div>
-      <!-- <div>{{ set.weight }} lb x {{ set.reps }} (RPE{{ set.rpe }})</div> -->
-      <!-- <div>{{ set.weight }} lb x {{ set.reps }}</div> -->
       <ExerciseSetDetails :set='set' />
     </div>
   </Card>
@@ -38,7 +29,6 @@ import Card from "@/components/Card.vue";
 import ExerciseSetDetails from "@/components/ExerciseSetDetails.vue";
 import ExerciseSetDetailsAverage from "@/components/ExerciseSetDetailsAverage.vue";
 import { calculate1RM } from "@/services/LiftingCalculator";
-// import { weightInPounds, distanceInMiles } from "@/services/UnitConversion";
 import { VTooltip } from "v-tooltip";
 
 @Component({
@@ -56,11 +46,6 @@ export default class ExerciseSessionItem extends Vue {
   @Prop({ default: false })
   private expanded!: boolean;
 
-  get linkPath() {
-    // return { name: "ExerciseShowView", params: { id: this.item.objectId }}
-    return "/";
-  }
-
   get bodyPartName() {
     return get(this.item, "bodyPart.name");
   }
@@ -74,25 +59,17 @@ export default class ExerciseSessionItem extends Vue {
     return format(date, "hh:mma, EEEE, MMMM dd y");
   }
 
-  getExerciseLinkPath(item: object) {
-    return `/exercises/${get(item, "exercise.objectId")}`;
-  }
-
   calculateAverage1RM(sets: Array<any>) {
-    // console.log(sets)
     const setsWith1RM = sets.map(set => {
       return calculate1RM({ weight: set.weight, reps: set.reps });
     });
-    console.log(setsWith1RM);
     const average = Math.round(
       setsWith1RM.reduce((p, c) => p + c, 0) / setsWith1RM.length
     );
-    // console.log(test)
     return average;
   }
 
   toggleExercises() {
-    console.log("toggleExercises", this.item);
     this.$emit("toggleExercises", this.item);
   }
 }

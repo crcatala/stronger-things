@@ -1,5 +1,6 @@
 <template>
-  <div class='ExerciseSetDetails' :class='$style.ExerciseSetDetails'>
+  <div class='ExerciseSetDetails'
+       :class='$style.ExerciseSetDetails'>
     <div v-if='isWeightType'>
       {{ weight }} lbs x {{ set.reps || set.expectedReps }}
     </div>
@@ -58,7 +59,7 @@ export default class ExerciseSetDetails extends Vue {
 <style lang='scss' module>
 @import "@/styles/variables.scss";
 
-.ExerciseSetDetails {
-  //
-}
+// .ExerciseSetDetails {
+//
+// }
 </style>

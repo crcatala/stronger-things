@@ -1,5 +1,6 @@
 <template>
-  <div class='ExerciseSetDetailsAverage' :class='$style.ExerciseSetDetailsAverage'>
+  <div class='ExerciseSetDetailsAverage'
+       :class='$style.ExerciseSetDetailsAverage'>
     <div v-if='valueOnly && isWeightType'> {{ average1RM }} lb</div>
     <div v-else>
       <div v-if='emptySets'>

@@ -33,7 +33,8 @@ export default {
 </script>
 
 <template>
-  <span class='app-chip' :style='styles'>
+  <span class='app-chip'
+        :style='styles'>
     <slot></slot>
   </span>
 </template>

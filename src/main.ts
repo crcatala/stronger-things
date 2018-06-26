@@ -5,7 +5,7 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import "normalize.css";
-import "@/styles/global.scss";
+import "@/styles/main.scss";
 
 Vue.use(Notifications);
 Vue.use(VModal, { dynamic: true });

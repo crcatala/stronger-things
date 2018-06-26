@@ -1,0 +1,41 @@
+@import "./variables.scss";
+
+//
+// Router Transitions
+//
+.route-enter-active,
+.route-leave-active {
+  transition: opacity 0.15s $swift-ease-out-timing-function;
+}
+
+.route-enter,
+.route-leave-to {
+  opacity: 0;
+}
+
+//
+// Shared Transitions
+//
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s $swift-ease-out-timing-function;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+// Modal Overrides
+.app-modal-container {
+  .v--modal-overlay {
+    background: rgba(72, 105, 151, 0.25);
+  }
+  .v--modal {
+    box-shadow: -1px 0 12px 0 rgba(0, 0, 0, 0.08);
+  }
+  .overlay-fade-enter-active,
+  .overlay-fade-leave-active {
+    transition: all 0.25s ease-in-out;
+  }
+}

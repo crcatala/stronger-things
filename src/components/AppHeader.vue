@@ -2,23 +2,35 @@
   <div>
     <div :class='$style.AppHeader'>
       <div :class='$style.leftSide'>
-        <router-link to='/' :class='$style.brand'>
+        <router-link to='/'
+                     :class='$style.brand'>
           <BrandLogo/>
         </router-link>
         <div :class='$style.AppHeader__nav'>
           <!-- <router-link :class='$style.AppHeader__link' :active-class="$style['AppHeader__link--active']" :to="{ name: 'ProfileView'}">Profile</router-link> -->
-          <router-link :class='$style.AppHeader__link' :active-class="$style['AppHeader__link--active']" :to="{ name: 'HistoryView'}">History</router-link>
-          <router-link :class='$style.AppHeader__link' :active-class="$style['AppHeader__link--active']" :to="{ name: 'ExercisesView'}">Exercises</router-link>
-          <router-link :class='$style.AppHeader__link' :active-class="$style['AppHeader__link--active']" :to="{ name: 'RoutinesView'}">Routines</router-link>
+          <router-link :class='$style.AppHeader__link'
+                       :active-class="$style['AppHeader__link--active']"
+                       :to="{ name: 'HistoryView'}">History</router-link>
+          <router-link :class='$style.AppHeader__link'
+                       :active-class="$style['AppHeader__link--active']"
+                       :to="{ name: 'ExercisesView'}">Exercises</router-link>
+          <router-link :class='$style.AppHeader__link'
+                       :active-class="$style['AppHeader__link--active']"
+                       :to="{ name: 'RoutinesView'}">Routines</router-link>
           <!-- <router-link :class='$style.AppHeader__link' :active-class="$style['AppHeader__link--active']" :to="{ name: 'MeasureView'}">Measure</router-link> -->
         </div>
       </div>
-      <div @click='profileDrawerVisible = true' :class='$style.UserProfileButton'>
+      <div v-if='currentUser'
+           @click='profileDrawerVisible = true'
+           :class='$style.UserProfileButton'>
         {{ currentUser.username }}
       </div>
     </div>
-    <Backdrop v-if='profileDrawerVisible' @close='profileDrawerVisible = false' />
-    <DrawerRight v-if='profileDrawerVisible' @close='profileDrawerVisible = false' backgroundColor='#fcfcfd'>
+    <Backdrop v-if='profileDrawerVisible'
+              @close='profileDrawerVisible = false' />
+    <DrawerRight v-if='profileDrawerVisible'
+                 @close='profileDrawerVisible = false'
+                 backgroundColor='#fcfcfd'>
       <div :class='$style.profileDrawerTitle'>Settings</div>
       <ProfileSettings @logout='profileDrawerVisible = false' />
     </DrawerRight>

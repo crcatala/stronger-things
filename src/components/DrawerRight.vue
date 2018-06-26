@@ -1,10 +1,11 @@
 <template>
-  <transition name='drawer-right' mode="out-in">
-    <!-- <div class='DrawerRight' :class='$style.DrawerRight'> -->
-    <div class='drawer' :class='$style.drawer' :style='styles'>
+  <transition name='drawer-right'
+              mode="out-in">
+    <div class='drawer'
+         :class='$style.drawer'
+         :style='styles'>
       <slot></slot>
     </div>
-    <!-- </div> -->
   </transition>
 </template>
 
@@ -44,15 +45,6 @@ export default {
 <style lang='scss' module>
 @import "@/styles/variables.scss";
 
-// .DrawerRight {
-//   z-index: 1000;
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   width: 100%;
-//   height: 100%;
-// }
-
 $drawer-width: 512px;
 $drawer-margin: 16px;
 
@@ -76,7 +68,6 @@ $drawer-margin: 16px;
 <style lang='scss'>
 .drawer-right-enter-active,
 .drawer-right-leave-active {
-  // transition: transform 0.25s ease-in-out;
   transition: transform 0.5s cubic-bezier(0.3, 1, 0.32, 1);
   transform: translateX(0px);
 }

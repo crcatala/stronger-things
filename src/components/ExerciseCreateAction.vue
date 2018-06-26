@@ -1,7 +1,5 @@
 <template>
   <AppButton @click.native='newClicked'>New</AppButton>
-  <!-- <div :class="$style.ExerciseCreateAction"> -->
-  <!-- </div> -->
 </template>
 
 <script lang="ts">
@@ -42,7 +40,6 @@ export default class ExerciseCreateAction extends Vue {
 </script>
 
 <style lang="scss" module>
-.ExerciseCreateAction {
-  // Styles
-}
+// .ExerciseCreateAction {
+// }
 </style>

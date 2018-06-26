@@ -1,34 +1,39 @@
 <template>
-  <Card class='WorkoutSessionCard' :class='$style["item-card"]'>
+  <Card class='WorkoutSessionCard'
+        :class='$style["item-card"]'>
     <div :class='$style["item-title"]'>{{ item.name }}</div>
     <div :class='$style["item-subtitle"]'>{{ item.workoutRoutineName }}</div>
     <div :class='$style["item-subtitle"]'>{{ formattedDate(item.startedAt) }}</div>
-    <div :class='{ [$style["item-title"]]: true, [$style.exercises]: true}' @click='toggleExercises'>
+    <div :class='{ [$style["item-title"]]: true, [$style.exercises]: true}'
+         @click='toggleExercises'>
       Exercises
       <span v-if='expanded'>(Expanded)</span>
       <span v-else>(Collapsed)</span>
     </div>
     <template v-if='expanded'>
-      <div v-for='(exercise, exerciseIndex) in item.exercises' :key='exerciseIndex'>
+      <div v-for='(exercise, exerciseIndex) in item.exercises'
+           :key='exerciseIndex'>
         <div :class='$style["exercise-item"]'>
-          <router-link :class='$style["exercise-link"]' :to='`/exercises/${exercise.exerciseId}`'>
+          <router-link :class='$style["exercise-link"]'
+                       :to='`/exercises/${exercise.exerciseId}`'>
             {{ exercise.sets.length }} x {{ exercise.name }}
           </router-link>
           <div :class='$style["exercise-item--highlight"]'>Avg 1RM = {{ calculateAverage1RM(exercise.sets) }} lb</div>
         </div>
-        <!-- <div :class='[$style["exercise-item"], $style["exercise-item--highlight"]]'>
-          <div>Avg 1RM</div>
-          <div>{{ calculateAverage1RM(exercise.sets) }} lb</div>
-        </div> -->
-        <div :class='$style["exercise-item"]' v-for='(set, setIndex) in exercise.sets' :key='setIndex'>
+        <div :class='$style["exercise-item"]'
+             v-for='(set, setIndex) in exercise.sets'
+             :key='setIndex'>
           <div>Set {{ setIndex + 1 }}</div>
           <div>{{ set.weight }} lb x {{ set.reps }} (RPE{{ set.rpe }})</div>
         </div>
       </div>
     </template>
     <template v-else>
-      <div :class='$style["exercise-item"]' v-for='(exercise, exerciseIndex) in item.exercises' :key='exerciseIndex'>
-        <router-link :class='$style["exercise-link"]' :to='`/exercises/${exercise.exerciseId}`'>{{ exercise.sets.length }} x {{ exercise.name }}</router-link>
+      <div :class='$style["exercise-item"]'
+           v-for='(exercise, exerciseIndex) in item.exercises'
+           :key='exerciseIndex'>
+        <router-link :class='$style["exercise-link"]'
+                     :to='`/exercises/${exercise.exerciseId}`'>{{ exercise.sets.length }} x {{ exercise.name }}</router-link>
         <div>{{ exercise.sets[0].weight }} lb x {{ exercise.sets[0].reps }}</div>
       </div>
     </template>

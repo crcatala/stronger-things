@@ -30,25 +30,6 @@ h6 {
 }
 
 //
-// search input
-//
-input.search {
-}
-
-//
-// Shared Transitions
-//
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.15s $swift-ease-out-timing-function;
-}
-
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-
-//
 // Link styles
 //
 a {
@@ -57,20 +38,5 @@ a {
 
   &:hover {
     color: lighten($color-blue, 10%);
-  }
-}
-
-// Modal Overrides
-.app-modal-container {
-  .v--modal-overlay {
-    background: rgba(72, 105, 151, 0.25);
-  }
-  .v--modal {
-    box-shadow: -1px 0 12px 0 rgba(0, 0, 0, 0.08);
-  }
-  .overlay-fade-enter-active,
-  .overlay-fade-leave-active {
-    // transition: all 0.2s;
-    transition: all 0.25s ease-in-out;
   }
 }

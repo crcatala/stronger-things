@@ -7,12 +7,12 @@
     </div>
     <div v-else-if='items.length'>
       <div :class='$style.filters'>
-        <div :class='$style.expansionToggle'
-             v-if='expandAll'
-             @click='collapseItems'>Collapse All</div>
-        <div :class='$style.expansionToggle'
-             v-else
-             @click='expandItems'>Expand All</div>
+        <ActionChip v-if='expandAll'
+                    :class='$style.expansionToggle'
+                    @click.native='collapseItems'>Collapse All</ActionChip>
+        <ActionChip v-else
+                    :class='$style.expansionToggle'
+                    @click.native='expandItems'>Expand All</ActionChip>
       </div>
       <WorkoutSessionItem :class='$style["item-card"]'
                           v-for='(item, index) in filteredItems'
@@ -37,6 +37,7 @@ import { Component, Prop, Watch, Vue } from "vue-property-decorator";
 import WorkoutSessionCard from "@/components/WorkoutSessionCard.vue";
 import WorkoutSessionItem from "@/components/WorkoutSessionItem.vue";
 import Spinner from "@/components/Spinner.vue";
+import ActionChip from "@/components/ActionChip.vue";
 import EmptyResults from "@/components/EmptyResults.vue";
 import Http from "@/services/Http";
 import { format } from "date-fns";
@@ -46,6 +47,7 @@ const PAGE_INVERVAL = 25;
 @Component({
   components: {
     Spinner,
+    ActionChip,
     EmptyResults,
     WorkoutSessionCard,
     WorkoutSessionItem
@@ -149,18 +151,6 @@ export default class HistoryView extends Vue {
 }
 
 .expansionToggle {
-  // TODO: this is exact styling from SingleSelect .selection except the display prop
   display: inline-block;
-  border-radius: 5px;
-  background-color: $color-grey-lighter;
-  color: #000000;
-  cursor: pointer;
-  padding: 4px 8px;
-  transition: $swift-ease-out;
-  transition-property: color, background-color;
-
-  &:hover {
-    background-color: darken($color-grey-lighter, 10%);
-  }
 }
 </style>

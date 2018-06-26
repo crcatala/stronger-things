@@ -32,7 +32,8 @@ export default {
 </script>
 
 <template>
-  <div class='card' :class='classes'>
+  <div class='card'
+       :class='classes'>
     <slot></slot>
   </div>
 </template>
@@ -63,7 +64,6 @@ $card-shiftable-offset: 6px;
 
   &--raised {
     border: none;
-    // border: 1px solid transparent;
     box-shadow: $shadow-subtle;
   }
 

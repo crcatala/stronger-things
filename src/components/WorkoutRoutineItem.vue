@@ -1,14 +1,8 @@
 <template>
-  <Card class='WorkoutRoutineItem' :class='$style["item-card"]'>
-    <!-- <div :class='$style["item-title"]'>{{ item.name }}</div> -->
-    <!-- <div :class='$style["item-title"]'>{{ item.name }}</div> -->
+  <Card class='WorkoutRoutineItem'
+        :class='$style["item-card"]'>
     <div :class='$style["item-title"]'>{{ item.objectId }}</div>
     <div :class='$style["item-subtitle"]'>Last updated {{ formattedDate(item.updatedAt) }}</div>
-    <!-- <div :class='$style["item-subtitle"]'>{{ item.workoutRoutineName }}</div>
-    <div :class='$style["item-subtitle"]'>{{ formattedDate(item.startedAt.iso) }}</div>
-    <div :class='{ [$style["item-title"]]: true, [$style.exercises]: true}' @click='toggleExercises'>
-      Exercises <span v-if='expanded'>(Expanded)</span><span v-else>(Collapsed)</span>
-    </div> -->
   </Card>
 </template>
 

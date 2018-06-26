@@ -1,15 +1,16 @@
 <template>
-  <div class='input-field' :class='classes'>
-    <input
-      ref='input'
-      class='input-field__input'
-      :value='value'
-      :placeholder='placeholder'
-      @input='input'
-      :type='type'
-      @keyup.enter.prevent='$emit("submit")'
-    />
-    <ClearIcon class='input-field__clear' v-if='value && clearable' @click.native='clear'/>
+  <div class='input-field'
+       :class='classes'>
+    <input ref='input'
+           class='input-field__input'
+           :value='value'
+           :placeholder='placeholder'
+           @input='input'
+           :type='type'
+           @keyup.enter.prevent='$emit("submit")' />
+    <ClearIcon class='input-field__clear'
+               v-if='value && clearable'
+               @click.native='clear' />
   </div>
 </template>
 
@@ -41,7 +42,7 @@ export default {
     },
     type: {
       type: String,
-      default: 'text'
+      default: "text"
     },
     autoSubmit: {
       type: Boolean,
@@ -69,7 +70,7 @@ export default {
     clear() {
       this.$emit("input", "");
       this.$emit("submit");
-    },
+    }
   },
   created() {
     this.debouncedSubmit = debounce(() => {
@@ -88,7 +89,6 @@ $input-field-height: 40px;
 $input-field-padding: 8px;
 
 .input-field {
-  // min-height: $input-field-height;
   display: block;
   position: relative;
   padding: $input-field-padding;
@@ -104,11 +104,9 @@ $input-field-padding: 8px;
     border: none;
     border-radius: 2px;
     background: #fff;
-    // padding: 1px 0 0 5px;
     width: 100%;
     transition: border 0.1s ease;
     box-sizing: border-box;
-    // margin-bottom: 8px;
     font-family: inherit;
     font-size: 14px;
     touch-action: manipulation;
@@ -120,7 +118,6 @@ $input-field-padding: 8px;
   }
 
   &--has-selection {
-    // border-color: $material-color-blue-300;
     border-color: $color-blue;
   }
 
@@ -131,12 +128,10 @@ $input-field-padding: 8px;
     top: $input-field-height/2 - $search-clear-icon-size/2;
     right: $input-field-padding;
     cursor: pointer;
-    // fill: $material-color-grey-700;
     fill: $color-grey;
     transition: $swift-ease-out;
 
     &:hover {
-      // fill: $material-color-grey-800;
       fill: $color-grey;
     }
   }

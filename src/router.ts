@@ -18,7 +18,6 @@ const router = new Router({
   routes: [
     {
       path: "/",
-      // redirect: "/profile"
       redirect: "/history"
     },
     {
@@ -39,9 +38,7 @@ const router = new Router({
     {
       path: "/exercises/:id",
       name: "ExerciseShowView",
-      // props: route => ({ id: parseInt(route.params.id) }),
       props: route => ({ id: route.params.id }),
-      // props: true,
       component: ExerciseShowView
     },
     {
@@ -60,7 +57,8 @@ const router = new Router({
       component: UserRegistrationView,
       meta: {
         bypassAuth: true,
-        redirectIfAuthenticated: true
+        redirectIfAuthenticated: true,
+        fullScreen: true
       }
     },
     {
@@ -69,7 +67,8 @@ const router = new Router({
       component: UserLoginView,
       meta: {
         bypassAuth: true,
-        redirectIfAuthenticated: true
+        redirectIfAuthenticated: true,
+        fullScreen: true
       }
     }
   ]

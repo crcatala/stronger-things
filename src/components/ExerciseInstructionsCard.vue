@@ -1,7 +1,8 @@
 <template>
   <Card :class="$style.ExerciseInstructionsCard">
     <h3 :class='$style.title'>Instructions</h3>
-    <p v-for='item in instructionItems'>
+    <p v-for='(item, index) in instructionItems'
+       :key='index'>
       {{ item }}
     </p>
   </Card>

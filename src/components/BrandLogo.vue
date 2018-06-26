@@ -1,7 +1,7 @@
 <template>
   <div :class='$style.BrandLogo'>
-    <img src='@/assets/brand-icon.png' :class='$style.icon'/>
-    Stronger Things
+    <img src='@/assets/brand-icon.png'
+         :class='$style.icon' /> Stronger Things
   </div>
 </template>
 

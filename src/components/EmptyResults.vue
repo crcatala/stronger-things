@@ -6,8 +6,8 @@
 
 <script>
 export default {
-  name: 'EmptyResults'
-}
+  name: "EmptyResults"
+};
 </script>
 
 <style lang="scss" module>

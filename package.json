@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "npm run serve",
-    "serve": "npx --max_old_space_size=4096 vue-cli-service serve",
+    "serve": "npx --max_old_space_size=8192 vue-cli-service serve",
     "mock-api": "npx json-server --watch tests/mock-api/index.js",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",

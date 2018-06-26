@@ -1,6 +1,8 @@
 <template>
-  <button :class='classes' :disabled='disabled'>
-    <slot name='loading' v-if='loading'>
+  <button :class='classes'
+          :disabled='disabled'>
+    <slot name='loading'
+          v-if='loading'>
       Loading...
     </slot>
     <slot v-else/>
@@ -9,15 +11,15 @@
 
 <script>
 export default {
-  name: 'AppButton',
+  name: "AppButton",
   props: {
     type: {
       type: String,
-      default: 'primary'
+      default: "primary"
     },
     loading: {
       type: Boolean,
-      default: false,
+      default: false
     },
     disabled: {
       type: Boolean,
@@ -29,8 +31,8 @@ export default {
       return {
         [this.$style.AppButton]: true,
         [this.$style.loading]: this.loading,
-        [this.$style['primary']]: this.type === 'primary',
-      }
+        [this.$style["primary"]]: this.type === "primary"
+      };
     }
   }
 };
@@ -51,7 +53,6 @@ export default {
   cursor: pointer;
 
   &[disabled] {
-    // background-color: lighten($color-blue, 5%);
     background-color: $color-grey;
     cursor: not-allowed;
 
