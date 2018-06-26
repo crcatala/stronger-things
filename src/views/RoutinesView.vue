@@ -1,11 +1,17 @@
 <template>
-  <div class='RoutinesView' :class='$style.root'>
+  <div class='RoutinesView'
+       :class='$style.root'>
     <h1>Routines</h1>
-    <div v-if='loading' :class='$style.loading'>
+    <div v-if='loading'
+         :class='$style.loading'>
       <Spinner/>
     </div>
-    <WorkoutRoutineItem v-else-if='items.length' v-for='(item, index) in items' :item='item' :key='index' />
-    <div v-else :class='$style.loading'>
+    <WorkoutRoutineItem v-else-if='items.length'
+                        v-for='(item, index) in items'
+                        :item='item'
+                        :key='index' />
+    <div v-else
+         :class='$style.loading'>
       <EmptyResults>No Routines</EmptyResults>
     </div>
   </div>
@@ -14,7 +20,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import Card from "@/components/Card.vue";
-import Parse from "@/services/Parse";
+import api from "@/api";
 import { format } from "date-fns";
 import WorkoutRoutineItem from "@/components/WorkoutRoutineItem.vue";
 import Spinner from "@/components/Spinner.vue";
@@ -39,13 +45,7 @@ export default class RoutinesView extends Vue {
   async fetchRoutines() {
     try {
       this.loading = true;
-      const query = new Parse.Query("ParseRoutine");
-      query.limit(100);
-      const user = new Parse.Object("_User", { id: this.currentUser.objectId });
-      query.equalTo("user", user);
-
-      const results = await query.find();
-      this.items = results.map((x: any) => x.toJSON());
+      this.items = await api.getRoutineList();
     } catch (e) {
       this.$notify({
         group: "main",

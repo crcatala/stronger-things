@@ -42,7 +42,7 @@ import EmptyResults from "@/components/EmptyResults.vue";
 import Spinner from "@/components/Spinner.vue";
 import { getExerciseTypeName } from "@/services/ExerciseType";
 import { getExerciseBodyPartName } from "@/services/ExerciseBodyPart";
-import Parse from "@/services/Parse";
+import api from "@/api";
 import { calculateAverage1RM } from "@/services/LiftingCalculator";
 
 @Component({
@@ -109,9 +109,7 @@ export default class ExerciseShowView extends Vue {
   async fetchExercise() {
     try {
       this.loading = true;
-      const query = new Parse.Query("ParseExercise");
-      const result = await query.get(this.id);
-      this.item = result.toJSON();
+      this.item = await api.getExerciseItem({ id: this.id });
     } catch (e) {
       this.$notify({
         group: "main",

@@ -1,4 +1,4 @@
-import Parse from "@/services/Parse";
+import api from "@/api";
 import get from "lodash/get";
 
 function getInitialState() {
@@ -55,18 +55,8 @@ export default {
       // TODO:
     },
     async checkForUpdates({ commit, getters }) {
-      const query = new Parse.Query("ParseWorkout");
-      query.select([""]);
-      query.limit(1);
-      const user = Parse.User.current();
-      query.equalTo("user", user);
-      query.equalTo("isHidden", 0);
-      query.descending("createdAt");
-
-      const results = await query.find();
-
-      const items = results.map(x => x.toJSON());
-      commit("setMostRecentRemoteItem", items[0] || null);
+      const item = await api.getLatestWorkout();
+      commit("setMostRecentRemoteItem", item || null);
       commit("setLastUpdateCheckedAt");
 
       if (getters.isUpToDate) {
@@ -75,22 +65,9 @@ export default {
       } else {
         console.log("Workouts not up to date. Refreshing workouts...");
       }
-      const workoutQuery = new Parse.Query("ParseWorkout");
-      workoutQuery
-        .include("parseOriginRoutine")
-        .include("parseRoutine")
-        .include("parseSetGroups.parseExercise");
-      // workoutQuery.limit(10);
-      workoutQuery.limit(1000);
-      workoutQuery.equalTo("user", user);
-      workoutQuery.equalTo("isHidden", 0);
-      workoutQuery.descending("createdAt");
 
-      const workouts = await workoutQuery.find();
-
-      const workoutItems = workouts.map(x => x.toJSON());
+      const workoutItems = await api.getWorkouts();
       commit("setList", workoutItems);
-      // console.log("getters.isUpToDate after", getters.isUpToDate);
     }
   }
 };

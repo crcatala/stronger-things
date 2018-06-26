@@ -3,25 +3,33 @@
     <div :class='$style.header'>
       <h1>Exercises</h1>
       <div>
-        <InputField placeholder='Search...' v-model='searchInput' :class='$style.input' @submit='search' autoSubmit clearable/>
+        <InputField placeholder='Search...'
+                    v-model='searchInput'
+                    :class='$style.input'
+                    @submit='search'
+                    autoSubmit
+                    clearable/>
       </div>
       <ExerciseCreateAction/>
     </div>
     <div :class='$style.filters'>
       <div>
         <div :class='$style.filterItem'>
-          <SingleSelect :options='bodyPartOptions' trackBy='id' label='name' noSelectionText="Any Body Part" @select='bodyPartSelected' />
+          <ExerciseBodyPartSelect @select='bodyPartSelected' />
         </div>
         <div :class='$style.filterItem'>
-          <SingleSelect :options='exerciseTypeOptions' trackBy='id' label='name' noSelectionText="Any Category" @select='exerciseTypeSelected' />
+          <ExerciseTypeSelect @select='exerciseTypeSelected' />
         </div>
       </div>
     </div>
-    <div v-if='loading' :class='$style.loading'>
+    <div v-if='loading'
+         :class='$style.loading'>
       <Spinner/>
     </div>
-    <ExerciseList :items='filteredItems' v-else-if='filteredItems.length' />
-    <div v-else :class='$style.loading'>
+    <ExerciseList :items='filteredItems'
+                  v-else-if='filteredItems.length' />
+    <div v-else
+         :class='$style.loading'>
       <EmptyResults v-if='searchFilter'>No Results Matching Filter</EmptyResults>
       <EmptyResults v-else>No Exercises</EmptyResults>
     </div>
@@ -32,20 +40,20 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import get from "lodash/get";
 import Multiselect from "@/components/Multiselect";
-import SingleSelect from "@/components/SingleSelect.vue";
+import ExerciseBodyPartSelect from "@/components/ExerciseBodyPartSelect.vue";
+import ExerciseTypeSelect from "@/components/ExerciseTypeSelect.vue";
 import ExerciseList from "@/components/ExerciseList.vue";
 import ExerciseCreateAction from "@/components/ExerciseCreateAction.vue";
 import InputField from "@/components/InputField.vue";
 import Spinner from "@/components/Spinner.vue";
 import EmptyResults from "@/components/EmptyResults.vue";
-import { EXERCISE_BODY_PART_OPTIONS } from "@/services/ExerciseBodyPart";
-import { EXERCISE_TYPE_OPTIONS } from "@/services/ExerciseType";
-import Parse from "@/services/Parse";
+import api from "@/api";
 
 @Component({
   components: {
     Multiselect,
-    SingleSelect,
+    ExerciseBodyPartSelect,
+    ExerciseTypeSelect,
     ExerciseList,
     ExerciseCreateAction,
     InputField,
@@ -54,22 +62,12 @@ import Parse from "@/services/Parse";
   }
 })
 export default class ExercisesView extends Vue {
-  @Prop() private msg!: string;
-
   loading: boolean = false;
   items: Array<object> = [];
   exerciseTypeFilter: any = null;
   bodyPartFilter: any = null;
   searchInput: string = "";
   searchFilter: string = ""; // Actual filter, lags behind input
-
-  get bodyPartOptions() {
-    return EXERCISE_BODY_PART_OPTIONS;
-  }
-
-  get exerciseTypeOptions() {
-    return EXERCISE_TYPE_OPTIONS;
-  }
 
   get filteredItems() {
     // TODO: Use more elegant reduce method or bring in library
@@ -119,17 +117,15 @@ export default class ExercisesView extends Vue {
   }
 
   async fetchExercises() {
-    const query = new Parse.Query("ParseExercise");
-    query.equalTo("isGlobal", true);
-    query.doesNotExist("user");
-    query.ascending("name");
-    query.limit(1000);
     try {
       this.loading = true;
-      const results = await query.find();
-      this.items = results.map((x: any) => x.toJSON());
+      this.items = await api.getExerciseList();
     } catch (e) {
-      console.log("TODO show error notification");
+      this.$notify({
+        group: "main",
+        type: "error",
+        title: "Error fetching exercises."
+      });
     } finally {
       this.loading = false;
     }

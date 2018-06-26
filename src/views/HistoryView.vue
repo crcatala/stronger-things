@@ -1,18 +1,31 @@
 <template>
   <div :class='$style.HistoryView'>
     <h1>History</h1>
-    <div v-if='loading' :class='$style.loading'>
+    <div v-if='loading'
+         :class='$style.loading'>
       <Spinner/>
     </div>
     <div v-else-if='items.length'>
       <div :class='$style.filters'>
-        <div :class='$style.expansionToggle' v-if='expandAll' @click='collapseItems'>Collapse All</div>
-        <div :class='$style.expansionToggle' v-else @click='expandItems'>Expand All</div>
+        <div :class='$style.expansionToggle'
+             v-if='expandAll'
+             @click='collapseItems'>Collapse All</div>
+        <div :class='$style.expansionToggle'
+             v-else
+             @click='expandItems'>Expand All</div>
       </div>
-      <WorkoutSessionItem :class='$style["item-card"]' v-for='(item, index) in filteredItems' :key='index' :item='item' :expanded='item.expanded' @toggleExercises='toggleExercises(item)' />
-      <div :class='$style.viewMore' v-if='filteredItems.length && filteredItems.length < items.length' @click='viewMore'>View More</div>
+      <WorkoutSessionItem :class='$style["item-card"]'
+                          v-for='(item, index) in filteredItems'
+                          :key='index'
+                          :item='item'
+                          :expanded='item.expanded'
+                          @toggleExercises='toggleExercises(item)' />
+      <div :class='$style.viewMore'
+           v-if='filteredItems.length && filteredItems.length < items.length'
+           @click='viewMore'>View More</div>
     </div>
-    <div v-else :class='$style.loading'>
+    <div v-else
+         :class='$style.loading'>
       <EmptyResults>No Workouts</EmptyResults>
     </div>
   </div>
@@ -58,84 +71,8 @@ export default class HistoryView extends Vue {
     }));
   }
 
-  async fetchWorkoutSessions() {
-    console.log("fetchWorkoutSessions...");
-    const query = new Parse.Query("WorkoutSession");
-    // query.include('category').include('bodyPart');
-    query
-      .include("exerciseSessions")
-      .include("workoutRoutine")
-      .include("user");
-    // query.include("workoutRoutine").include("user");
-    // query.matches("name", searchFilter, "i")
-    query.limit(10);
-    try {
-      this.loading = true;
-      const results = await query.find();
-      const workoutSessions = results.map((x: any) => ({
-        ...x.toJSON(),
-        expanded: false
-      }));
-
-      const promises = results.map((result: any) => {
-        const relation = result.relation("exerciseSessions");
-        const query = relation.query().include("exercise");
-        return query.find();
-      });
-
-      const exerciseSessionsResults: Array<any> = await Promise.all(promises);
-
-      workoutSessions.forEach((workoutSession: any, index: number) => {
-        // Yes we are mutating
-        workoutSession.exerciseSessions = exerciseSessionsResults[index].map(
-          (x: any) => x.toJSON()
-        );
-      });
-
-      this.workoutSessions = workoutSessions;
-    } catch (e) {
-      console.log("TODO show error notification");
-    } finally {
-      this.loading = false;
-    }
-  }
-
   get currentUser() {
     return this.$store.getters["sessions/currentUser"];
-  }
-
-  async fetchWorkouts() {
-    const query = new Parse.Query("ParseWorkout");
-    query
-      .include("parseOriginRoutine")
-      .include("parseRoutine")
-      .include("parseSetGroups.parseExercise");
-    query.limit(10);
-    const user = new Parse.Object("_User", { id: this.currentUser.objectId });
-    query.equalTo("user", user);
-    query.equalTo("isHidden", 0);
-    query.descending("completionDate");
-
-    const results = await query.find();
-
-    const items = results.map((x: any) => x.toJSON());
-  }
-
-  async checkIfUpdateRequired() {
-    const query = new Parse.Query("ParseWorkout");
-    // query.select(["completionDate"]);
-    query.select([""]);
-    query.limit(1);
-    const user = new Parse.Object("_User", { id: this.currentUser.objectId });
-    query.equalTo("user", user);
-    query.equalTo("isHidden", 0);
-    query.descending("updatedAt");
-
-    const results = await query.find();
-
-    const items = results.map((x: any) => x.toJSON());
-
-    console.log("checkIfUpdateRequired", items);
   }
 
   viewMore() {
